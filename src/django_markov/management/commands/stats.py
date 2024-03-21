@@ -7,6 +7,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+from typing import Any
+
 from django.db.models import Sum
 from django.utils.translation import gettext_lazy as _
 from django_typer import TyperCommand
@@ -19,7 +21,7 @@ from django_markov.models import MarkovStats, MarkovTextModel
 class Command(TyperCommand):
     help = _("Get a count of models and the total sentences generated.")
 
-    def handle(self):
+    def handle(self, *args: Any, **options: Any):  # noqa: ARG002
         model_count = MarkovTextModel.objects.filter(data__notnull=True).count()
         total_sentences = MarkovStats.objects.aggregate(Sum("num_sentences"))[
             "num_sentences__sum"

@@ -7,6 +7,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+from collections.abc import Generator
+from typing import Any
+
 import pytest
 
 from django_markov.models import MarkovTextModel
@@ -37,7 +40,7 @@ That, out there. That's my grave. On one of our adventures Rick and I basically 
 
 @pytest.fixture
 @pytest.mark.django_db(transaction=True)
-def text_model() -> MarkovTextModel:
+def text_model() -> Generator[MarkovTextModel, Any, Any]:
     text_model = MarkovTextModel.objects.create()
     yield text_model
     text_model.delete()
@@ -45,7 +48,7 @@ def text_model() -> MarkovTextModel:
 
 @pytest.fixture
 @pytest.mark.django_db(transaction=True)
-def compiled_model(sample_corpus) -> MarkovTextModel:
+def compiled_model(sample_corpus) -> Generator[MarkovTextModel, Any, Any]:
     model = MarkovTextModel.objects.create()
     model.update_model_from_corpus(sample_corpus)
     yield model
