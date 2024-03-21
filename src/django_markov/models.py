@@ -1,3 +1,12 @@
+#
+# models.py
+#
+# Copyright (c) 2024 Daniel Andrlik
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
 """Models"""
 
 from typing import Any
@@ -6,8 +15,8 @@ from asgiref.sync import async_to_sync
 from django import dispatch
 from django.conf import settings
 from django.db import models
-from django.db.models.signals import post_save
 from django.db.models import F
+from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
 from django_markov.text_models import POSifiedText

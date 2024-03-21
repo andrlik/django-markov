@@ -1,3 +1,12 @@
+#
+# settings.py
+#
+# Copyright (c) 2024 Daniel Andrlik
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
 from pathlib import Path
 
 import environ
@@ -20,7 +29,6 @@ SITE_ID = 1
 
 USE_I18N = True
 
-USE_L10N = True
 
 USE_TZ = True
 

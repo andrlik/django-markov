@@ -162,7 +162,7 @@ unfixable = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*.py" = ["S101", "FBT001"]
+"tests/*.py" = ["S101", "FBT001", "ARG001"]
 "tests/urls.py" = ["RUF005"]
 "conftest.py" = ["ARG001"]
 

@@ -1,3 +1,12 @@
+#
+# test_models.py
+#
+# Copyright (c) 2024 Daniel Andrlik
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
 import pytest
 
 from django_markov.models import MarkovStats, MarkovTextModel, get_corpus_char_limit
