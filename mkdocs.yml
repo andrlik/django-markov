@@ -1,0 +1,14 @@
+site_name: Django Markov Documentation
+site_author: Daniel Andrlik
+nav:
+  - Home: index.md
+  - Changelog: changelog.md
+  - Security: security.md
+  - Code of Conduct: code_of_conduct.md
+theme:
+  name: material
+  palette:
+    primary: indigo
+    scheme: slate
+plugins:
+  - include-markdown
