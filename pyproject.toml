@@ -8,11 +8,7 @@ authors = [
 dependencies = [
     "django>=5.0.3",
     "markovify>=0.9.4",
-    "django-extensions>=3.2.3",
     "spacy>=3.7.4",
-    "django-environ>=0.11.2",
-    "argon2-cffi>=23.1.0",
-    "argon2-cffi-bindings>=21.2.0",
 ]
 readme = "README.md"
 license = "BSD-3-Clause"
@@ -57,6 +53,8 @@ dev-dependencies = [
     "black>=24.3.0",
     "django-coverage>=1.2.4",
     "django-coverage-plugin>=3.1.0",
+    "argon2-cffi>=23.1.0",
+    "django-environ>=0.11.2",
 ]
 
 [tool.hatch.metadata]
@@ -235,6 +233,11 @@ replace = "version = \"{new_version}\""
 filename = "CHANGELOG.md"
 search = "## Unreleased"
 replace = "## {new_version}"
+
+[[tool.bumpversion.files]]
+filename = "CHANGELOG.md"
+search = "{current_version}...HEAD"
+replace = "{current_version}...{new_version}"
 
 [tool.django-stubs]
 django-settings-module = "tests.settings"

@@ -11,10 +11,8 @@
 annotated-types==0.6.0
     # via pydantic
 argon2-cffi==23.1.0
-    # via django-markov
 argon2-cffi-bindings==21.2.0
     # via argon2-cffi
-    # via django-markov
 asgiref==3.8.0
     # via django
 babel==2.14.0
@@ -62,14 +60,10 @@ cymem==2.0.8
     # via spacy
     # via thinc
 django==5.0.3
-    # via django-extensions
     # via django-markov
 django-coverage==1.2.4
 django-coverage-plugin==3.1.0
 django-environ==0.11.2
-    # via django-markov
-django-extensions==3.2.3
-    # via django-markov
 django-types==0.19.1
 en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.7.3/en_core_web_trf-3.7.3-py3-none-any.whl
 filelock==3.13.1

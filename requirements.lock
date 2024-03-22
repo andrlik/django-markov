@@ -10,11 +10,6 @@
 -e file:.
 annotated-types==0.6.0
     # via pydantic
-argon2-cffi==23.1.0
-    # via django-markov
-argon2-cffi-bindings==21.2.0
-    # via argon2-cffi
-    # via django-markov
 asgiref==3.8.0
     # via django
 blis==0.7.11
@@ -25,8 +20,6 @@ catalogue==2.0.10
     # via thinc
 certifi==2024.2.2
     # via requests
-cffi==1.16.0
-    # via argon2-cffi-bindings
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
@@ -41,11 +34,6 @@ cymem==2.0.8
     # via spacy
     # via thinc
 django==5.0.3
-    # via django-extensions
-    # via django-markov
-django-environ==0.11.2
-    # via django-markov
-django-extensions==3.2.3
     # via django-markov
 idna==3.6
     # via requests
@@ -72,8 +60,6 @@ packaging==24.0
 preshed==3.0.9
     # via spacy
     # via thinc
-pycparser==2.21
-    # via cffi
 pydantic==2.6.4
     # via confection
     # via spacy
