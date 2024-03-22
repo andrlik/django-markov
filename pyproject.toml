@@ -230,7 +230,7 @@ search = "version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 
 [[tool.bumpversion.files]]
-filename = "CHANGLOG.md"
+filename = "CHANGELOG.md"
 search = "## Unreleased"
 replace = "## {new_version}"
 
