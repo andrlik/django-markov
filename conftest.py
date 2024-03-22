@@ -50,6 +50,6 @@ def text_model() -> Generator[MarkovTextModel, Any, Any]:
 @pytest.mark.django_db(transaction=True)
 def compiled_model(sample_corpus) -> Generator[MarkovTextModel, Any, Any]:
     model = MarkovTextModel.objects.create()
-    model.update_model_from_corpus(sample_corpus)
+    model.update_model_from_corpus([sample_corpus])
     yield model
     model.delete()
