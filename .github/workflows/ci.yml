@@ -1,0 +1,63 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+    group: test-${{ github.head_ref }}
+    cancel-in-progress: true
+
+env:
+  PYTHONUNBUFFERED: "1"
+  FORCE_COLOR: "1"
+  DJANGO_DEBUG: "1"
+
+jobs:
+  run:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        id: setup_python
+        uses: actions/setup-python@4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        run: pip install --upgrade uv
+
+      - name: Setup cache
+        uses: actions/cache@3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements-dev.lock') }}
+          restore-keys: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-
+
+      - name: Create venv, install dependencies
+        run: |
+          python -m uv venv
+          python -m uv pip install -r requirements-dev.lock
+          source .venv/bin/activate
+          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: |
+          python -m pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/django_markov
+          python -m coverage lcov
+          - name: Submit coverage data to coveralls.io
+            uses: coverallsapp/github-action@master
+            with:
+              github-token: ${{ secrets.GITHUB_TOKEN }}
+              path-to-lcov: "coverage.lcov"
