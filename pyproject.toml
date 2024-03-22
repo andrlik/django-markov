@@ -1,7 +1,7 @@
 [project]
 name = "django-markov"
 version = "0.0.1"
-description = "Add your description here"
+description = "django-markov is a reusable Django app that enables you to create Markov text models, and store them in the database. Those models can then be used to generate Markov chain sentences."
 authors = [
     { name = "Daniel Andrlik", email = "daniel@andrlik.org" }
 ]
