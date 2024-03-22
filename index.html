@@ -746,7 +746,19 @@ say that you have a text model in your database already, and you want a sentence
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="k">return</span> <span class="k">await</span> <span class="n">text_model</span><span class="o">.</span><span class="n">agenerate_sentence</span><span class="p">(</span><span class="n">char_limit</span><span class="o">=</span><span class="n">char_limit</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Every time a sentence is generated the <code>sentence_generated</code> signal will be emitted. You
-can use this for things like collecting stats, creating an ongoing log of output, etc.</p>
+can use this for things like collecting stats, creating an ongoing log of output, etc. The
+signal will have the kwargs of:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span> <span class="nn">django_markov.models</span> <span class="kn">import</span> <span class="n">MarkovTextModel</span><span class="p">,</span> <span class="n">sentence_generated</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">text_model</span> <span class="o">=</span> <span class="n">MarkovTextModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">sentence_generated</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">sender</span><span class="o">=</span><span class="n">MarkovTextModel</span><span class="p">,</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="n">instance</span><span class="o">=</span><span class="n">text_model</span><span class="p">,</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="n">char_limit</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="n">sentence</span><span class="o">=</span><span class="s2">&quot;Life is stranger than a monkey riding a unicycle.&quot;</span><span class="p">,</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">)</span>
+</span></code></pre></div>
 <h2 id="contributing">Contributing</h2>
 <p>Pull requests and improvements are welcome! First, familiarize yourself with our
 <a href="https://andrlik.github.io/django-markov/code_of_conduct/">Code of Conduct</a>. You will need to agree to abide by this to have your contribution
@@ -754,14 +766,14 @@ included.</p>
 <p>Django apps are often not fond of <code>src</code> layout packages.
 To avoid these complications, and to enable debug mode add the following environment variables
 using <code>.envrc</code> for direnv, a <code>.env</code> file or similar.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DJANGO_SETTINGS_MODULE</span><span class="o">=</span><span class="s2">&quot;tests.settings&quot;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DJANGO_DEBUG</span><span class="o">=</span><span class="s2">&quot;True&quot;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PYTHONPATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DJANGO_SETTINGS_MODULE</span><span class="o">=</span><span class="s2">&quot;tests.settings&quot;</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DJANGO_DEBUG</span><span class="o">=</span><span class="s2">&quot;True&quot;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PYTHONPATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">&quot;</span>
 </span></code></pre></div>
 <p>We use <a href="https://github.com/casey/just">just</a> and <a href="https://rye-up">Rye</a> to manage our project.
 If you don't already have <code>just</code> installed, follow the directions on their project page.</p>
 <p>Then run our setup command.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>just<span class="w"> </span>bootstrap
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>just<span class="w"> </span>bootstrap
 </span></code></pre></div>
 <p>It will do the following for you:</p>
 <ul>
@@ -775,10 +787,10 @@ If you don't already have <code>just</code> installed, follow the directions on 
 <p>Our Justfile can handle a lot of the admin tasks for you without having to worry about
 whether you've activated your venv. To see all the commands you can run <code>just help</code>.</p>
 <p>For example, to access Django functions such as <code>makemigrations</code>, run:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>just<span class="w"> </span>manage<span class="w"> </span>makemigrations<span class="w"> </span>django_markov
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>just<span class="w"> </span>manage<span class="w"> </span>makemigrations<span class="w"> </span>django_markov
 </span></code></pre></div>
 <p>To run the test suite:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>just<span class="w"> </span><span class="nb">test</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>just<span class="w"> </span><span class="nb">test</span>
 </span></code></pre></div>
 <p>Then make your changes and commit as usual. Any change made to the behavior or logic
 should also include tests, and updated documentation. Pull requests must also pass all
