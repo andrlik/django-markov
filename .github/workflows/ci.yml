@@ -56,8 +56,9 @@ jobs:
         run: |
           python -m pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/django_markov
           python -m coverage lcov
-          - name: Submit coverage data to coveralls.io
-            uses: coverallsapp/github-action@master
-            with:
-              github-token: ${{ secrets.GITHUB_TOKEN }}
-              path-to-lcov: "coverage.lcov"
+
+      - name: Submit coverage data to coveralls.io
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: "coverage.lcov"
