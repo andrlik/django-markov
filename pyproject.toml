@@ -229,5 +229,10 @@ filename = "pyproject.toml"
 search = "version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 
+[[tool.bumpversion.files]]
+filename = "CHANGLOG.md"
+search = "## Unreleased"
+replace = "## {new_version}"
+
 [tool.django-stubs]
 django-settings-module = "tests.settings"
