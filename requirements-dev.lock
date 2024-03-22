@@ -38,7 +38,6 @@ charset-normalizer==3.3.2
 click==8.1.7
     # via black
     # via bump-my-version
-    # via django-typer
     # via mkdocs
     # via mkdocstrings
     # via rich-click
@@ -65,14 +64,11 @@ cymem==2.0.8
 django==5.0.3
     # via django-extensions
     # via django-markov
-    # via django-typer
 django-coverage==1.2.4
 django-coverage-plugin==3.1.0
 django-environ==0.11.2
     # via django-markov
 django-extensions==3.2.3
-    # via django-markov
-django-typer==1.0.7
     # via django-markov
 django-types==0.19.1
 en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.7.3/en_core_web_trf-3.7.3-py3-none-any.whl
@@ -232,8 +228,6 @@ setuptools==69.2.0
     # via nodeenv
     # via spacy
     # via thinc
-shellingham==1.5.4
-    # via django-typer
 six==1.16.0
     # via python-dateutil
 smart-open==6.4.0
@@ -270,7 +264,6 @@ torch==2.2.1
 tqdm==4.66.2
     # via spacy
 typer==0.9.0
-    # via django-typer
     # via spacy
     # via weasel
 types-psycopg2==2.9.21.20240311

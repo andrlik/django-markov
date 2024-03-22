@@ -30,7 +30,6 @@ cffi==1.16.0
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
-    # via django-typer
     # via typer
 cloudpathlib==0.16.0
     # via weasel
@@ -44,12 +43,9 @@ cymem==2.0.8
 django==5.0.3
     # via django-extensions
     # via django-markov
-    # via django-typer
 django-environ==0.11.2
     # via django-markov
 django-extensions==3.2.3
-    # via django-markov
-django-typer==1.0.7
     # via django-markov
 idna==3.6
     # via requests
@@ -91,8 +87,6 @@ requests==2.31.0
 setuptools==69.2.0
     # via spacy
     # via thinc
-shellingham==1.5.4
-    # via django-typer
 smart-open==6.4.0
     # via spacy
     # via weasel
@@ -114,7 +108,6 @@ thinc==8.2.3
 tqdm==4.66.2
     # via spacy
 typer==0.9.0
-    # via django-typer
     # via spacy
     # via weasel
 typing-extensions==4.10.0

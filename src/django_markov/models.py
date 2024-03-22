@@ -9,14 +9,10 @@
 
 """Models"""
 
-from typing import Any
-
 from asgiref.sync import async_to_sync
 from django import dispatch
 from django.conf import settings
 from django.db import models
-from django.db.models import F
-from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
 from django_markov.text_models import POSifiedText
@@ -35,9 +31,15 @@ def get_corpus_char_limit() -> int:
 class MarkovTextModel(models.Model):
     """Stores a compiled markov text model."""
 
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    data = models.JSONField(null=True, blank=True)
+    created = models.DateTimeField(
+        auto_now_add=True, help_text=_("When the model was created.")
+    )
+    modified = models.DateTimeField(
+        auto_now=True, help_text=_("Last modification of the record.")
+    )
+    data = models.JSONField(
+        null=True, blank=True, help_text=_("The compiled text model as JSON.")
+    )
 
     def __str__(self):  # no cov
         return f"MarkovModel {self.pk}"
@@ -72,11 +74,15 @@ class MarkovTextModel(models.Model):
         self, corpus: str, char_limit: int | None = None
     ) -> None:
         """Sync wrapper for the async version"""
-        async_to_sync(self.aupdate_model_from_corpus)(
+        async_to_sync(self.aupdate_model_from_corpus)(  # no cov
             corpus=corpus, char_limit=char_limit
         )
 
     def generate_sentence(self, char_limit: int = 0) -> str | None:
+        """Sync wrapper for agenerate_sentence."""
+        return async_to_sync(self.agenerate_sentence)(char_limit)  # no cov
+
+    async def agenerate_sentence(self, char_limit: int = 0) -> str | None:
         """Generates a random sentence within the character limit
         based on the model.
         Args:
@@ -92,55 +98,13 @@ class MarkovTextModel(models.Model):
             sentence = text_model.make_short_sentence(max_chars=char_limit)
         else:
             sentence = text_model.make_sentence()
-        sentence_generated.send(
-            sender=self.__class__, instance=self, char_limit=char_limit
+        # Emit a signal that can be used by other apps for things such as statistics.
+        # Right now, pyright doesn't recognize the asend method as valid member of
+        # django.dispatch.Signal
+        sentence_generated.asend(  # type: ignore
+            sender=self.__class__,
+            instance=self,
+            char_limit=char_limit,
+            sentence=sentence,
         )
         return sentence
-
-
-class MarkovStats(models.Model):
-    """Stores statistics on the related Markov model."""
-
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    text_model = models.OneToOneField(
-        MarkovTextModel, related_name="stats", on_delete=models.CASCADE
-    )
-    num_sentences = models.PositiveIntegerField(
-        default=0, help_text=_("Number of sentences generated from model.")
-    )
-    num_short_sentences = models.PositiveIntegerField(
-        default=0, help_text=_("Of the total, how many were short?")
-    )
-
-    def __str__(self):  # no cov
-        return f"Stats for {self.text_model}"
-
-
-@dispatch.receiver(sentence_generated)
-def update_sentence_stats(
-    sender,  # noqa: ARG001
-    instance,
-    char_limit: int,
-    *args: Any,  # noqa: ARG001
-    **kwargs: Any,  # noqa: ARG001
-) -> None:
-    """Update the stats for the related instance."""
-    stat_object = instance.stats
-    stat_object.num_sentences = F("num_sentences") + 1
-    if char_limit > 0:
-        stat_object.num_short_sentences = F("num_short_sentences") + 1
-    stat_object.save()
-
-
-@dispatch.receiver(post_save, sender=MarkovTextModel)
-def create_stats_object(
-    sender,  # noqa: ARG001
-    instance: MarkovTextModel,
-    created: bool,  # noqa: FBT001
-    *args: Any,  # noqa: ARG001
-    **kwargs: Any,  # noqa: ARG001
-) -> None:
-    """Create the accompanying stats object for the new model."""
-    if created:
-        MarkovStats.objects.create(text_model=instance)
