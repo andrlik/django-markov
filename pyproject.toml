@@ -24,9 +24,11 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-repository = "https://github.com/andrlik/django-markov"
-documentation = "https://andrlik.github.io/django-markov"
-homepage = "https://andrlik.github.io/django-markov"
+
+[project.urls]
+Repository = "https://github.com/andrlik/django-markov"
+Documentation = "https://andrlik.github.io/django-markov"
+Homepage = "https://andrlik.github.io/django-markov"
 
 
 [build-system]
