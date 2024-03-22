@@ -38,7 +38,7 @@ jobs:
         run: pip install --upgrade uv
 
       - name: Setup cache
-        uses: actions/cache@3
+        uses: actions/cache@v3
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements-dev.lock') }}
