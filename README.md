@@ -106,7 +106,21 @@ async def sentence(text_model: MarkovTextModel, char_limit: int) -> str | None:
 ```
 
 Every time a sentence is generated the `sentence_generated` signal will be emitted. You
-can use this for things like collecting stats, creating an ongoing log of output, etc.
+can use this for things like collecting stats, creating an ongoing log of output, etc. The
+signal will have the kwargs of:
+
+```python
+from django_markov.models import MarkovTextModel, sentence_generated
+
+text_model = MarkovTextModel.objects.create()
+
+sentence_generated.send(
+    sender=MarkovTextModel,
+    instance=text_model,
+    char_limit=500,
+    sentence="Life is stranger than a monkey riding a unicycle.",
+)
+```
 
 ## Contributing
 
