@@ -85,8 +85,8 @@ lint: check
     rye check
 
 # Run the test suite
-test: check
-    rye run pytest
+test *ARGS: check
+    rye run pytest {{ ARGS }}
 
 # Access Django management commands.
 manage *ARGS:

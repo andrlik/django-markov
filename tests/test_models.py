@@ -9,7 +9,7 @@
 
 import pytest
 
-from django_markov.models import get_corpus_char_limit
+from django_markov.models import _get_corpus_char_limit
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -25,7 +25,7 @@ def test_get_char_limit(
     settings, override_value: int | None, expected_result: int
 ) -> None:
     settings.MARKOV_CORPUS_MAX_CHAR_LIMIT = override_value
-    assert get_corpus_char_limit() == expected_result
+    assert _get_corpus_char_limit() == expected_result
 
 
 @pytest.mark.asyncio

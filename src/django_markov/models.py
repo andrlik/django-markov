@@ -20,7 +20,9 @@ from django_markov.text_models import POSifiedText
 sentence_generated = dispatch.Signal()
 
 
-def get_corpus_char_limit() -> int:
+def _get_corpus_char_limit() -> int:
+    """Get the corpus character limit from settings or return a default.
+    """
     if not settings.MARKOV_CORPUS_MAX_CHAR_LIMIT or not isinstance(
         settings.MARKOV_CORPUS_MAX_CHAR_LIMIT, int
     ):
@@ -29,7 +31,13 @@ def get_corpus_char_limit() -> int:
 
 
 class MarkovTextModel(models.Model):
-    """Stores a compiled markov text model."""
+    """Stores a compiled markov text model.
+
+    Attributes:
+        created (datetime.datetime): Date and time when the model was created.
+        modified (datetime.datetime): Date and time when the model was last modified.
+        data (JSON): The compiled text model as JSON.
+    """
 
     created = models.DateTimeField(
         auto_now_add=True, help_text=_("When the model was created.")
@@ -46,6 +54,9 @@ class MarkovTextModel(models.Model):
 
     @property
     def is_ready(self) -> bool:
+        """Flag to indicate if the model is initialized and ready
+        to generate sentences.
+        """
         if self.data:
             return True
         return False
@@ -55,13 +66,14 @@ class MarkovTextModel(models.Model):
     ) -> None:
         """Takes the corpus and updates the model, saving it.
         The corpus must not exceed the char_limit.
+
         Args:
             corpus_entries (list[str]): The corpus as a list of text sentences.
             char_limit (int | None): The maximum number of characters
                 to allow in the corpus.
         """
         if not char_limit:
-            char_limit = get_corpus_char_limit()
+            char_limit = _get_corpus_char_limit()
         corpus = " ".join(corpus_entries)
         if char_limit != 0 and char_limit < len(corpus):
             msg = f"Supplied corpus is over the maximum character limit: {char_limit}"
@@ -86,6 +98,7 @@ class MarkovTextModel(models.Model):
     async def agenerate_sentence(self, char_limit: int = 0) -> str | None:
         """Generates a random sentence within the character limit
         based on the model.
+
         Args:
             char_limit (int): Maximum characters to use. If zero, no limit.
         Returns:
@@ -102,10 +115,11 @@ class MarkovTextModel(models.Model):
         # Emit a signal that can be used by other apps for things such as statistics.
         # Right now, pyright doesn't recognize the asend method as valid member of
         # django.dispatch.Signal
-        sentence_generated.asend(  # type: ignore
-            sender=self.__class__,
-            instance=self,
-            char_limit=char_limit,
-            sentence=sentence,
-        )
+        if sentence is not None:
+            sentence_generated.asend(  # type: ignore
+                sender=self.__class__,
+                instance=self,
+                char_limit=char_limit,
+                sentence=sentence,
+            )
         return sentence

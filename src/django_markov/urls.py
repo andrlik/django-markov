@@ -7,7 +7,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-"""Markov URL Configuration"""
+"""Markov URL Configuration
+
+There is nothing required here.
+"""
 
 app_name = "django_markov"
 urlpatterns = []
