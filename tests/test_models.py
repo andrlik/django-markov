@@ -49,9 +49,13 @@ async def test_update_corpus_excessive(
     settings.MARKOV_CORPUS_MAX_CHAR_LIMIT = settings_limit
     if expect_error:
         with pytest.raises(ValueError):
-            await text_model.aupdate_model_from_corpus(sample_corpus, char_limit)
+            await text_model.aupdate_model_from_corpus(
+                [sample_corpus, "My name is Inigo Montoya."], char_limit
+            )
     else:
-        await text_model.aupdate_model_from_corpus(sample_corpus, char_limit)
+        await text_model.aupdate_model_from_corpus(
+            [sample_corpus, "My name is Inigo Montoya."], char_limit
+        )
         await text_model.arefresh_from_db()
         assert text_model.data
 
@@ -60,7 +64,9 @@ async def test_update_corpus_excessive(
 async def test_update_corpus(text_model, sample_corpus) -> None:
     assert not text_model.data
     mod_time = text_model.modified
-    await text_model.aupdate_model_from_corpus(sample_corpus)
+    await text_model.aupdate_model_from_corpus(
+        [sample_corpus, "My name is Inigo Montoya."]
+    )
     await text_model.arefresh_from_db()
     assert text_model.data
     assert text_model.modified > mod_time

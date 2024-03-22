@@ -51,17 +51,18 @@ class MarkovTextModel(models.Model):
         return False
 
     async def aupdate_model_from_corpus(
-        self, corpus: str, char_limit: int | None = None
+        self, corpus_entries: list[str], char_limit: int | None = None
     ) -> None:
         """Takes the corpus and updates the model, saving it.
         The corpus must not exceed the char_limit.
         Args:
-            corpus (str): The corpus as a string of text sentences.
+            corpus_entries (list[str]): The corpus as a list of text sentences.
             char_limit (int | None): The maximum number of characters
                 to allow in the corpus.
         """
         if not char_limit:
             char_limit = get_corpus_char_limit()
+        corpus = " ".join(corpus_entries)
         if char_limit != 0 and char_limit < len(corpus):
             msg = f"Supplied corpus is over the maximum character limit: {char_limit}"
             raise ValueError(msg)
@@ -71,11 +72,11 @@ class MarkovTextModel(models.Model):
         await self.asave()
 
     def update_model_from_corpus(
-        self, corpus: str, char_limit: int | None = None
+        self, corpus_entries: list[str], char_limit: int | None = None
     ) -> None:
         """Sync wrapper for the async version"""
         async_to_sync(self.aupdate_model_from_corpus)(  # no cov
-            corpus=corpus, char_limit=char_limit
+            corpus_entries=corpus_entries, char_limit=char_limit
         )
 
     def generate_sentence(self, char_limit: int = 0) -> str | None:
