@@ -116,7 +116,7 @@ class MarkovTextModel(models.Model):
         # Right now, pyright doesn't recognize the asend method as valid member of
         # django.dispatch.Signal
         if sentence is not None:
-            sentence_generated.asend(  # type: ignore
+            await sentence_generated.asend(  # type: ignore
                 sender=self.__class__,
                 instance=self,
                 char_limit=char_limit,
