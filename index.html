@@ -763,12 +763,9 @@ signal will have the kwargs of:</p>
 <p>Pull requests and improvements are welcome! First, familiarize yourself with our
 <a href="https://andrlik.github.io/django-markov/code_of_conduct/">Code of Conduct</a>. You will need to agree to abide by this to have your contribution
 included.</p>
-<p>Django apps are often not fond of <code>src</code> layout packages.
-To avoid these complications, and to enable debug mode add the following environment variables
+<p>To enable debug mode, add the following environment variable
 using <code>.envrc</code> for direnv, a <code>.env</code> file or similar.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DJANGO_SETTINGS_MODULE</span><span class="o">=</span><span class="s2">&quot;tests.settings&quot;</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DJANGO_DEBUG</span><span class="o">=</span><span class="s2">&quot;True&quot;</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PYTHONPATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DJANGO_DEBUG</span><span class="o">=</span><span class="s2">&quot;True&quot;</span>
 </span></code></pre></div>
 <p>We use <a href="https://github.com/casey/just">just</a> and <a href="https://rye-up">Rye</a> to manage our project.
 If you don't already have <code>just</code> installed, follow the directions on their project page.</p>
@@ -777,7 +774,7 @@ If you don't already have <code>just</code> installed, follow the directions on 
 </span></code></pre></div>
 <p>It will do the following for you:</p>
 <ul>
-<li>Check if you've set the above environment variables.</li>
+<li>Check if you've set the above environment variable.</li>
 <li>Check if pre-commit is on your path.</li>
 <li>Check if Rye is installed, and install it if it is not.</li>
 <li>Install the pre-commit hooks into your repo.</li>
