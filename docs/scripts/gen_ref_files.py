@@ -14,7 +14,6 @@ for path in sorted(Path("src/django_markov").rglob("*.py")):
     package_parts = tuple(module_package_path.parts)
 
     if "migrations" not in parts and parts[-1] != "__init__":
-
         if parts[-1].startswith("_") or parts[-1] == "src":
             continue
 

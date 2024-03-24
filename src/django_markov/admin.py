@@ -17,4 +17,5 @@ from django_markov.models import MarkovTextModel
 @admin.register(MarkovTextModel)
 class MarkovTextModelAdmin(admin.ModelAdmin):
     """Model admin for MarkovTextModel."""
+
     pass

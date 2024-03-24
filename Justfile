@@ -41,21 +41,8 @@ _check-pre-commit:
 
 _check-env:
     #!/usr/bin/env bash
-    EXIT_CODE="0"
     if [[ -z "$DJANGO_DEBUG" ]]; then
       echo "DJANGO_DEBUG is not set and application will run in production mode." >&2
-    fi
-    if [[ -z "$DJANGO_SETTINGS_MODULE" ]]; then
-      echo "DJANGO_SETTINGS_MODULE is not set in env and must be set to 'tests.settings'!" >&2
-      EXIT_CODE="1"
-    fi
-    if [[ "$PYTHONPATH" != *"$(pwd)"* ]]; then
-      echo "PYTHONPATH does not include the current directory! Some management functions will not succeed until this is fixed." >&2
-    fi
-    if [[ "$EXIT_CODE" == "1" ]]; then
-      exit 1
-    else
-      echo "All systems operational!"
     fi
 
 # Setup the project and update dependencies.
@@ -89,36 +76,37 @@ test *ARGS: check
     rye run pytest {{ ARGS }}
 
 # Access Django management commands.
-manage *ARGS:
-    rye run django-admin {{ ARGS }}
+manage *ARGS: check
+    #!/usr/bin/env bash
+    DJANGO_SETTINGS_MODULE="tests.settings" PYTHONPATH="$PYTHONPATH:$(pwd)" rye run django-admin {{ ARGS }}
 
 # Run tests in CI.
 citest:
-  # TODO
+    # TODO
 
 # Check types
-check-types:
-  rye run pyright
+check-types: check
+    rye run pyright
 
 # Access mkdocs commands
 docs *ARGS: check
-  rye run mkdocs {{ ARGS }}
+    rye run mkdocs {{ ARGS }}
 
 # Build Python package
 build *ARGS: check
-  rye build {{ ARGS }}
+    rye build {{ ARGS }}
 
 # Deletes pycache directories and files
 _pycache-remove:
-  find . | grep -E "(__pycache__|\.pyc|\.pyo$$)" | xargs rm -rf
+    find . | grep -E "(__pycache__|\.pyc|\.pyo$$)" | xargs rm -rf
 
 # Removes any build artifacts
 _build-remove:
-  rm -rf dist/*
+    rm -rf dist/*
 
 # Removes any built docs
 _docs-clean:
-  rm -rf site/*
+    rm -rf site/*
 
 # Removes build artifacts
 clean: _pycache-remove _build-remove _docs-clean

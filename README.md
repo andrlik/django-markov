@@ -128,14 +128,11 @@ Pull requests and improvements are welcome! First, familiarize yourself with our
 [Code of Conduct](https://andrlik.github.io/django-markov/code_of_conduct/). You will need to agree to abide by this to have your contribution
 included.
 
-Django apps are often not fond of `src` layout packages.
-To avoid these complications, and to enable debug mode add the following environment variables
+To enable debug mode, add the following environment variable
 using `.envrc` for direnv, a `.env` file or similar.
 
 ```bash
-export DJANGO_SETTINGS_MODULE="tests.settings"
 export DJANGO_DEBUG="True"
-export PYTHONPATH="$PYTHONPATH:$(pwd)"
 ```
 
 We use [just](https://github.com/casey/just) and [Rye](https://rye-up) to manage our project.
@@ -149,7 +146,7 @@ just bootstrap
 
 It will do the following for you:
 
-- Check if you've set the above environment variables.
+- Check if you've set the above environment variable.
 - Check if pre-commit is on your path.
 - Check if Rye is installed, and install it if it is not.
 - Install the pre-commit hooks into your repo.

@@ -15,5 +15,6 @@ class MarkovConfig(AppConfig):
     """
     App config for Django.
     """
+
     name = "django_markov"
     verbose_name = _("Django Markov")
