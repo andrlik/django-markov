@@ -56,6 +56,7 @@ dev-dependencies = [
     "argon2-cffi>=23.1.0",
     "django-environ>=0.11.2",
     "django-extensions>=3.2.3",
+    "pytest-mock>=3.14.0",
 ]
 
 [tool.hatch.metadata]
@@ -164,6 +165,7 @@ unfixable = [
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["S101", "FBT001", "ARG001"]
 "tests/urls.py" = ["RUF005"]
+"tests/model_load_timings.py" = ["T201"]
 "conftest.py" = ["ARG001"]
 
 [tool.ruff.lint.isort]

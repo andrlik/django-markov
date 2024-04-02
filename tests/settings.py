@@ -189,3 +189,6 @@ TEST_RUNNER = "django.test.runner.DiscoverRunner"
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 MARKOV_CORPUS_MAX_CHAR_LIMIT = env("DJANGO_MARKOV_MAX_CHAR_LIMIT", cast=int, default=0)  # type: ignore
+MARKOV_STORE_COMPILED_MODELS = env.bool(
+    "DJANGO_MARKOV_STORE_COMPILED_MODELS", default=True
+)

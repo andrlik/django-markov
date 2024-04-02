@@ -20,3 +20,6 @@ staticfiles/*
 # Mkdocs
 
 site/*
+
+tests/sample_corpus/*
+tests/model_load_timings.py

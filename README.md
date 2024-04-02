@@ -55,6 +55,14 @@ INSTALLED_APPS = [
 # performance when loading the compiled model from the database.
 # Use 0 for no limit, or specify a character limit.
 MARKOV_CORPUS_MAX_CHAR_LIMIT = 0
+
+# Compile text models by default when writing to database.
+# Compiled models are significantly more performant when
+# generating sentences, but they cannot be chained with other
+# model without parsing the entire corpus again.
+# What's best will depend on your use case. If you don't intend
+# to combine multiple models, you'll want this set to True.
+MARKOV_STORE_COMPILED_MODELS = True
 ```
 
 Then run migrations as usual.
