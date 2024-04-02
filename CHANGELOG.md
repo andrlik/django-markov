@@ -1,7 +1,7 @@
 # Changelog
 
-## Unreleased
-[Compare the full difference](https://github.com/andrlik/django-podcast-analyzer/compare/0.1.1...HEAD)
+## 0.2.0
+[Compare the full difference](https://github.com/andrlik/django-podcast-analyzer/compare/0.1.1...0.2.0)
 
 - Improves sentence generation performance by loading the text model into a cached property.
     - Cached properties are cleared when calling `refresh_from_db`.
