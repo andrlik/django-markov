@@ -9,8 +9,9 @@
 
 """Models"""
 
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Literal
 
+import markovify
 from asgiref.sync import async_to_sync
 from django import dispatch
 from django.conf import settings
@@ -19,6 +20,13 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from django_markov.text_models import POSifiedText
+
+
+class MarkovCombineError(Exception):
+    """Exception raised when attempt to combine incompatible model chains."""
+
+    pass
+
 
 sentence_generated = dispatch.Signal()
 
@@ -38,9 +46,7 @@ class MarkovTextModel(models.Model):
     Attributes:
         created (datetime.datetime): Date and time when the model was created.
         modified (datetime.datetime): Date and time when the model was last modified.
-        data (JSON): The compiled text model as JSON.
-        compiled (bool): Whether the model is stored in its compiled state. Initially
-            set to True for safe migrations.
+        data (JSON): The text model as JSON.
     """
 
     cached_properties: ClassVar[list[str]] = ["_compiled_model"]
@@ -52,7 +58,7 @@ class MarkovTextModel(models.Model):
         auto_now=True, help_text=_("Last modification of the record.")
     )
     data = models.JSONField(
-        null=True, blank=True, help_text=_("The compiled text model as JSON.")
+        null=True, blank=True, help_text=_("The text model as JSON.")
     )
 
     def __str__(self):  # no cov
@@ -100,8 +106,6 @@ class MarkovTextModel(models.Model):
             POSifiedText | None: The compiled model loaded from `self.data`, or None if
                 `self.data` is None
         """
-        if not self.is_ready:
-            return None
         text_model = self._as_text_model()
         if not text_model:
             return None
@@ -144,9 +148,6 @@ class MarkovTextModel(models.Model):
         updated_model = POSifiedText(corpus)
         if store_compiled:
             updated_model.compile(inplace=True)
-            self.compiled = True
-        else:
-            self.compiled = False
         self.data = updated_model.to_json()
         await self.asave()
 
@@ -202,3 +203,105 @@ class MarkovTextModel(models.Model):
                 sentence=sentence,
             )
         return sentence
+
+    @classmethod
+    async def acombine_models(
+        cls,
+        models: list["MarkovTextModel"],
+        *,
+        return_type: Literal["model_instance", "text_model"] = "model_instance",
+        mode: Literal["strict", "permissive"] = "strict",
+        weights: list[float] | None = None,
+    ) -> tuple["MarkovTextModel | POSifiedText", int]:
+        """Combine multiple MarkovTextModels into a single model.
+
+        Models cannot be combined if any of the following is true:
+            - They are empty of data.
+            - They are stored in compiled state.
+            - The state size between models is not the same.
+            - The underlying text models are not the same type (if you subclass).
+            - You supply weights, but not the same number as the models to combine
+                or if you use permissive mode.
+
+        Args:
+            models (list[MarkovTextModel]): A list of MarkovTextModel instances to
+                combine.
+            return_type (Literal["model_instance", "text_model"]): The desired result
+                 type.
+            mode (Literal["strict", "permissive"]): strict indicates that an exception
+                should be raised if any of the candidate models are incompatible, or
+                if those specific instances should simply be dropped from the operation.
+            weights (list[float] | None): A list of floats representing the relative
+                weights to put on each source. Optional, but can only be used with
+                mode='strict'.
+
+        Returns:
+            Either a new MarkovTextModel instance
+                persisted to the database or a POSifiedText object to manipulate at a
+                low level, and the total number of models combined.
+        """
+        # First we check to ensure that the models are combinable.
+        empty_models = []
+        compiled_models = []
+        workable_models = []
+        if mode not in ["strict", "permissive"]:
+            msg = f"Invalid mode: {mode}. Must be one of 'strict' or 'permissive'!"
+            raise ValueError(msg)
+        if weights is not None and mode != "strict":
+            msg = "Weights can only be provided if mode is set to strict!"
+            raise ValueError(msg)
+        if return_type not in ["model_instance", "text_model"]:
+            msg = (
+                f"Invalid return_type of {return_type} requested. Must be one of "
+                "'model_instance' or 'text_model'"
+            )
+            raise ValueError(msg)
+        for model in models:
+            if not model.is_ready:
+                empty_models.append(model)
+            else:
+                tm = model._as_text_model()
+                if tm and tm.chain.compiled:
+                    compiled_models.append(model)
+                else:
+                    workable_models.append(model)
+        if mode == "strict":
+            if empty_models or compiled_models:
+                msg = f"There are {len(compiled_models)} compiled models "
+                f"and {len(empty_models)} empty models in set!"
+                raise MarkovCombineError(msg)
+        if len(workable_models) <= 1:
+            msg = f"There is only {len(workable_models)}. Cannot combine!"
+            raise MarkovCombineError(msg)
+        models_combined = len(workable_models)
+        try:
+            combined_model = markovify.combine(
+                models=[m._as_text_model() for m in workable_models], weights=weights
+            )
+        except ValueError as m_err:
+            msg = f"Combining models caused the following error: {m_err}"
+            raise MarkovCombineError(msg) from m_err
+        if not isinstance(combined_model, POSifiedText):  # no cov
+            msg = "Received invalid result from markovify. "
+            f"Returned type is {type(combined_model)}"
+            raise MarkovCombineError(msg)
+        if return_type == "text_model":
+            return combined_model, models_combined  # type: ignore
+        new_model = await MarkovTextModel.objects.acreate(data=combined_model.to_json())
+        return new_model, models_combined
+
+    @classmethod
+    def combine_models(
+        cls,
+        models: list["MarkovTextModel"],
+        *,
+        return_type: Literal["model_instance", "text_model"] = "model_instance",
+        mode: Literal["strict", "permissive"] = "strict",
+        weights: list[float] | None = None,
+    ) -> tuple["MarkovTextModel | POSifiedText", int]:
+        """
+        Sync wrapper of acombine_models.
+        """
+        return async_to_sync(cls.acombine_models)(  # no cov
+            models=models, return_type=return_type, mode=mode, weights=weights
+        )

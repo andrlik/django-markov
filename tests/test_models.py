@@ -7,12 +7,17 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+from typing import Any
+
 import pytest
+from faker import Faker
 
 from django_markov.models import (
+    MarkovCombineError,
     MarkovTextModel,
     _get_corpus_char_limit,
 )
+from django_markov.text_models import POSifiedText
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -111,3 +116,115 @@ async def test_generate_sentence(compiled_model, char_limit: int) -> None:
 def test_markov_not_ready(text_model) -> None:
     assert not text_model.is_ready
     assert not text_model.generate_sentence(char_limit=0)
+
+
+@pytest.mark.asyncio
+async def test_combine_strict_fail_on_ready(text_model, compiled_model) -> None:
+    with pytest.raises(MarkovCombineError):
+        await MarkovTextModel.acombine_models(models=[text_model, compiled_model])
+
+
+@pytest.mark.asyncio
+async def test_combine_strict_fail_on_compiled(compiled_model, sample_corpus) -> None:
+    new_model = await MarkovTextModel.objects.acreate()
+    await new_model.aupdate_model_from_corpus(
+        [sample_corpus, "My name is Inigo Montoya"], store_compiled=False
+    )
+    with pytest.raises(MarkovCombineError):
+        await MarkovTextModel.acombine_models(models=[new_model, compiled_model])
+
+
+@pytest.mark.asyncio
+async def test_combine_permissive_fail_on_small_set(compiled_model, text_model) -> None:
+    faker = Faker()
+    corpus = faker.paragraph(nb_sentences=10)
+    new_model = await MarkovTextModel.objects.acreate(
+        data=POSifiedText(corpus).to_json()
+    )
+    with pytest.raises(MarkovCombineError):
+        await MarkovTextModel.acombine_models(
+            models=[text_model, compiled_model, new_model],
+            mode="permissive",
+            return_type="model_instance",
+        )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "mode,return_type,weights,expected_error_type",
+    [
+        ("frieds", "text_model", [0.6, 1.4], ValueError),
+        ("permissive", "text_model", [0.6, 1.4], ValueError),
+        ("permissive", "goulash", None, ValueError),
+        ("strict", "model_instance", [0.5, 0.4, 0.1], MarkovCombineError),
+    ],
+)
+async def test_combine_invalid_parameter_combinations(
+    compiled_model,
+    sample_corpus,
+    mode: str,
+    return_type: str,
+    weights: list[float] | None,
+    expected_error_type: Exception,
+) -> None:
+    new_model = await MarkovTextModel.objects.acreate()
+    await new_model.aupdate_model_from_corpus(
+        [sample_corpus, "My name is Inigo Montoya"], store_compiled=False
+    )
+    await compiled_model.aupdate_model_from_corpus(
+        [sample_corpus, "You killed my father.", "Prepare to die."],
+        store_compiled=False,
+    )
+    with pytest.raises(expected_error_type):
+        await MarkovTextModel.acombine_models(
+            models=[new_model, compiled_model],
+            mode=mode,
+            return_type=return_type,
+            weights=weights,
+        )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "num_clean,num_empty,num_compiled,mode,result_type,weights,expected_result_type",
+    [
+        (3, 0, 0, "strict", "model_instance", [1.0, 1.0, 1.0], MarkovTextModel),
+        (3, 0, 0, "strict", "text_model", [1.0, 1.0, 1.0], POSifiedText),
+        (3, 0, 0, "strict", "model_instance", None, MarkovTextModel),
+        (3, 0, 0, "strict", "text_model", None, POSifiedText),
+        (3, 2, 3, "permissive", "model_instance", None, MarkovTextModel),
+        (3, 2, 4, "permissive", "text_model", None, POSifiedText),
+    ],
+)
+async def test_acombine_successful(
+    num_clean: int,
+    num_empty: int,
+    num_compiled: int,
+    mode: str,
+    result_type: str,
+    weights: list[float] | None,
+    expected_result_type: Any,
+) -> None:
+    # Generate models.
+    faker = Faker()
+    models_to_combine = []
+    if num_empty:
+        for _ in range(num_empty):
+            models_to_combine.append(await MarkovTextModel.objects.acreate())
+    if num_compiled:
+        for _ in range(num_compiled):
+            corpus = faker.paragraph(nb_sentences=10)
+            pos_model = POSifiedText(corpus).compile(inplace=True)
+            comp_model = await MarkovTextModel.objects.acreate(data=pos_model.to_json())
+            models_to_combine.append(comp_model)
+    for _ in range(num_clean):
+        corpus = faker.paragraph(nb_sentences=10)
+        clean_model = await MarkovTextModel.objects.acreate()
+        await clean_model.aupdate_model_from_corpus([corpus], store_compiled=False)
+        await clean_model.arefresh_from_db()
+        models_to_combine.append(clean_model)
+    result, total_combined = await MarkovTextModel.acombine_models(
+        models=models_to_combine, mode=mode, return_type=result_type, weights=weights
+    )
+    assert isinstance(result, expected_result_type)
+    assert total_combined == num_clean

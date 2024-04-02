@@ -57,6 +57,7 @@ dev-dependencies = [
     "django-environ>=0.11.2",
     "django-extensions>=3.2.3",
     "pytest-mock>=3.14.0",
+    "faker>=24.4.0",
 ]
 
 [tool.hatch.metadata]

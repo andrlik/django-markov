@@ -10,6 +10,7 @@
     - This can be overridden when calling `update_model_from_corpus` using the `store_compiled` kwarg.
     - Adds ability to auto-detect if a loaded model is compiled or not, and will automatically compile for sentence generation if needed.
 - Adds support for the `tries` directive when calling `generate_sentence`.
+- Adds support for combining multiple models into one via `MarkovTextModel.combine_models`
 
 ## 0.1.1
 [Compare the full difference](https://github.com/andrlik/django-podcast-analyzer/compare/0.1.0...0.1.1)
