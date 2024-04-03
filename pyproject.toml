@@ -58,6 +58,7 @@ dev-dependencies = [
     "django-extensions>=3.2.3",
     "pytest-mock>=3.14.0",
     "faker>=24.4.0",
+    "bandit[toml]>=1.7.8",
 ]
 
 [tool.hatch.metadata]
@@ -245,3 +246,6 @@ replace = "{current_version}...{new_version}"
 
 [tool.django-stubs]
 django-settings-module = "tests.settings"
+
+[tool.bandit]
+exclude_dirs = ["tests", "conftest.py", "src/django_markov/migrations"]

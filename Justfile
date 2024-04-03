@@ -75,6 +75,10 @@ lint: check
 test *ARGS: check
     rye run pytest {{ ARGS }}
 
+# Runs bandit safetry checks.
+safety: check
+    rye run python -m bandit -c pyproject.toml -r src
+
 # Access Django management commands.
 manage *ARGS: check
     #!/usr/bin/env bash

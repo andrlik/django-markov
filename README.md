@@ -11,6 +11,7 @@ and [spacy](https://spacy.io).
 [![Rye](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/rye/main/artwork/badge.json)](https://rye-up.com)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![security: bandit](https://img.shields.io/badge/security-bandit-brightgreen.svg)](https://github.com/PyCQA/bandit)
 [![Checked with pyright](https://microsoft.github.io/pyright/img/pyright_badge.svg)](https://microsoft.github.io/pyright/)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/andrlik/django-markov/ci.yml?branch=main)
 [![Coverage Status](https://coveralls.io/repos/github/andrlik/django-markov/badge.svg?branch=main)](https://coveralls.io/github/andrlik/django-markov?branch=main)
