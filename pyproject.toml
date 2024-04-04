@@ -39,6 +39,7 @@ test = [
     "django-environ",
     "pytest-mock",
     "faker",
+    "django-extensions",
 ]
 
 
