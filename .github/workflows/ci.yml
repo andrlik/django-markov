@@ -51,11 +51,11 @@ jobs:
       - name: Create venv, install dependencies
         run: |
           python -m uv venv
+          python -m uv pip install -r .[tests]
+          python -m uv pip install Django~="${{ matrix.django-version }}.0"
           source .venv/bin/activate
           echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
           echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-          python -m uv pip install -r .[tests]
-          python -m uv pip install Django~="${{ matrix.django-version }}.0"
           python -m spacy download en-core-web-trf
 
       - name: Run tests
