@@ -75,7 +75,7 @@ lint: check
 test *ARGS: check
     rye run pytest {{ ARGS }}
 
-# Runs bandit safetry checks.
+# Runs bandit safety checks.
 safety: check
     rye run python -m bandit -c pyproject.toml -r src
 
