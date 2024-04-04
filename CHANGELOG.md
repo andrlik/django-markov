@@ -1,6 +1,13 @@
 # Changelog
 
+## Unreleased
+
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.0...HEAD)
+
+- Adds a migration for data field in MarkovTextModel.
+
 ## 0.2.0
+
 [Compare the full difference](https://github.com/andrlik/django-markov/compare/0.1.1...0.2.0)
 
 - Improves sentence generation performance by loading the text model into a cached property.
@@ -13,6 +20,7 @@
 - Adds support for combining multiple models into one via `MarkovTextModel.combine_models`
 
 ## 0.1.1
+
 [Compare the full difference](https://github.com/andrlik/django-markov/compare/0.1.0...0.1.1)
 
 - Remove extraneous dependencies that should only appear in dev-dependencies.
