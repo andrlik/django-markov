@@ -55,11 +55,12 @@ jobs:
           fi
           python -m uv pip install --upgrade pip
           python -m uv pip install -e .[test]
+          python -m uv pip install "en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.7.3/en_core_web_trf-3.7.3-py3-none-any.whl"
           python -m uv pip install Django~="${{ matrix.django-version }}.0"
           source .venv/bin/activate
           echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
           echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-          python -m spacy download en_core_web_trf
+
 
       - name: Run tests
         run: |
