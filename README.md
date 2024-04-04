@@ -6,6 +6,7 @@ It relies on the excellent [markovify](https://github.com/jsvine/markovify) by [
 and [spacy](https://spacy.io).
 
 ![PyPI - Version](https://img.shields.io/pypi/v/django-markov)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-markov)
 ![PyPI - Versions from Framework Classifiers](https://img.shields.io/pypi/frameworkversions/django/django-markov)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Rye](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/rye/main/artwork/badge.json)](https://rye-up.com)

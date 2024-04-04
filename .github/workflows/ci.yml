@@ -3,10 +3,10 @@ name: test
 on:
   push:
     branches: [main]
-    paths-ignore: [ "docs/**", "README.md", "CHANGELOG.md"]
+    paths-ignore: [ "docs/**", "README.md", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "Justfile"]
   pull_request:
     branches: [main]
-    paths-ignore: [ "docs/**", "README.md", "CHANGELOG.md"]
+    paths-ignore: [ "docs/**", "README.md", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "Justfile"]
 
 concurrency:
     group: test-${{ github.head_ref }}
@@ -26,15 +26,17 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.11", "3.12"]
+        django-version: ["5.0"]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }} for Django ${{ matrix.django-version }}
         id: setup_python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          django-version: ${{ matrix.django-version }}
 
       - name: Install uv
         run: pip install --upgrade uv
@@ -43,16 +45,22 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements-dev.lock') }}
-          restore-keys: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-Django-${{ steps.setup_python.outputs.django_version }}-${{ hashFiles('requirements-dev.lock') }}
+          restore-keys: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-Django-${{ steps.setup_python.outputs.django_version }}-
 
       - name: Create venv, install dependencies
         run: |
-          python -m uv venv
-          python -m uv pip install -r requirements-dev.lock
+          if [ ! -d .venv ]; then
+            python -m uv venv
+          fi
+          python -m uv pip install --upgrade pip
+          python -m uv pip install -e .[test]
+          python -m uv pip install "en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.7.3/en_core_web_trf-3.7.3-py3-none-any.whl"
+          python -m uv pip install Django~="${{ matrix.django-version }}.0"
           source .venv/bin/activate
           echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
           echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
 
       - name: Run tests
         run: |
