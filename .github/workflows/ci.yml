@@ -50,7 +50,9 @@ jobs:
 
       - name: Create venv, install dependencies
         run: |
-          python -m uv venv
+          if [ ! -d .venv ]; then
+            python -m uv venv
+          fi
           python -m uv pip install --upgrade pip
           python -m uv pip install -e .[test]
           python -m uv pip install Django~="${{ matrix.django-version }}.0"
