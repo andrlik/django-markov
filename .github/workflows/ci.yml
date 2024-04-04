@@ -19,7 +19,7 @@ env:
 
 jobs:
   run:
-    name: Python ${{ matrix.python-version }}
+    name: Python ${{ matrix.python-version }} ${{ matrix.django-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
