@@ -1,5 +1,11 @@
 # Changelog
 
+# Unreleased
+
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.1...HEAD)
+
+- Bug fix: gracefully handle when `MARKOV_CORPUS_MAX_CHAR_LIMIT` is not set.
+
 ## 0.2.1
 
 [Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.0...0.2.1)

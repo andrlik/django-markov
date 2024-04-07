@@ -33,7 +33,7 @@ sentence_generated = dispatch.Signal()
 
 def _get_corpus_char_limit() -> int:
     """Get the corpus character limit from settings or return a default."""
-    if not settings.MARKOV_CORPUS_MAX_CHAR_LIMIT or not isinstance(
+    if not hasattr(settings, "MARKOV_CORPUS_MAX_CHAR_LIMIT") or not isinstance(
         settings.MARKOV_CORPUS_MAX_CHAR_LIMIT, int
     ):
         return 0

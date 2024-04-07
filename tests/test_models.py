@@ -36,6 +36,11 @@ def test_get_char_limit(
     assert _get_corpus_char_limit() == expected_result
 
 
+def test_get_char_limit_missing_settings(settings):
+    del settings.MARKOV_CORPUS_MAX_CHAR_LIMIT
+    assert _get_corpus_char_limit() == 0  # Setting was not present
+
+
 def test_text_models_return_none_on_empty_directive():
     model = MarkovTextModel.objects.create()
     assert not model._as_text_model()
