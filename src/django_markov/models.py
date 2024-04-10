@@ -106,6 +106,9 @@ class MarkovTextModel(models.Model):
     def is_compiled_model(self) -> bool:
         """
         Checks if the stored data for the text mile is compiled.
+
+        Raises:
+            MarkovEmptyError: if the model data is null.
         """
         text_model = self._as_text_model()
         if text_model is None:
