@@ -14,6 +14,7 @@ from faker import Faker
 
 from django_markov.models import (
     MarkovCombineError,
+    MarkovEmptyError,
     MarkovTextModel,
     _get_corpus_char_limit,
 )
@@ -48,6 +49,7 @@ def test_text_models_return_none_on_empty_directive():
 
 
 def test_do_not_recompile_compiled_model(compiled_model):
+    assert compiled_model.is_compiled_model
     assert (
         compiled_model._as_text_model().to_json()
         == compiled_model._compiled_model.to_json()
@@ -63,6 +65,13 @@ def test_compile_non_compiled_model(sample_corpus):
     model.refresh_from_db()
     assert not model._as_text_model().chain.compiled
     assert model._compiled_model.chain.compiled
+    assert not model.is_compiled_model
+
+
+def test_inspect_empty_model():
+    model = MarkovTextModel.objects.create()
+    with pytest.raises(MarkovEmptyError):
+        compiled = model.is_compiled_model  # noqa: F841
 
 
 @pytest.mark.asyncio

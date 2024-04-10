@@ -28,6 +28,13 @@ class MarkovCombineError(Exception):
     pass
 
 
+class MarkovEmptyError(Exception):
+    """Raised when attempting to do model comparison and inspection on
+    empty models."""
+
+    pass
+
+
 sentence_generated = dispatch.Signal()
 
 
@@ -49,7 +56,7 @@ class MarkovTextModel(models.Model):
         data (JSON): The text model as JSON.
     """
 
-    cached_properties: ClassVar[list[str]] = ["_compiled_model"]
+    cached_properties: ClassVar[list[str]] = ["_compiled_model", "is_compiled_model"]
 
     created = models.DateTimeField(
         auto_now_add=True, help_text=_("When the model was created.")
@@ -94,6 +101,17 @@ class MarkovTextModel(models.Model):
             return None
         text_model = POSifiedText.from_json(self.data)
         return text_model
+
+    @cached_property
+    def is_compiled_model(self) -> bool:
+        """
+        Checks if the stored data for the text mile is compiled.
+        """
+        text_model = self._as_text_model()
+        if text_model is None:
+            msg = "There is not data in this model and it cannot be inspected."
+            raise MarkovEmptyError(msg)
+        return text_model.chain.compiled
 
     @cached_property
     def _compiled_model(self) -> POSifiedText | None:

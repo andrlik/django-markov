@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.1...HEAD)
+
+- Adds a cached property `is_compiled_model` to `MarkovTextModel`. This allows a user to check in advance if models are compiled without having to know the internals of `markovify`.
+
 ## 0.2.2
 
 [Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.1...0.2.2)
