@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.3
 
 [Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.1...HEAD)
 
