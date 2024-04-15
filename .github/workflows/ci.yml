@@ -33,7 +33,7 @@ jobs:
 
       - name: Set up Python ${{ matrix.python-version }} for Django ${{ matrix.django-version }}
         id: setup_python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           django-version: ${{ matrix.django-version }}
