@@ -65,6 +65,14 @@ MARKOV_CORPUS_MAX_CHAR_LIMIT = 0
 # What's best will depend on your use case. If you don't intend
 # to combine multiple models, you'll want this set to True.
 MARKOV_STORE_COMPILED_MODELS = True
+
+# Specify a state size for generated models. State size is the
+# number of words the probability of a next word depends on.
+# The default for the markovify library is 2.
+# NOTE: models with different state sizes cannot be combined
+# with one another. If you change this setting after creating
+# models, you should regenerate them with their original corpus.
+MARKOV_STATE_SIZE = 2
 ```
 
 Then run migrations as usual.

@@ -1,8 +1,14 @@
 # Changelog
 
+## Unreleased
+
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.3...HEAD)
+
+- Adds a new optional setting `MARKOV_STATE_SIZE` to override the default value used by `markovify`. Note that state sizes need to be consistent, so changing this setting means you should regenerate your text models with the new size.
+
 ## 0.2.3
 
-[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.1...HEAD)
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.2...0.2.3)
 
 - Adds a cached property `is_compiled_model` to `MarkovTextModel`. This allows a user to check in advance if models are compiled without having to know the internals of `markovify`.
 

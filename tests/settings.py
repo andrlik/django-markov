@@ -192,3 +192,4 @@ MARKOV_CORPUS_MAX_CHAR_LIMIT = env("DJANGO_MARKOV_MAX_CHAR_LIMIT", cast=int, def
 MARKOV_STORE_COMPILED_MODELS = env.bool(
     "DJANGO_MARKOV_STORE_COMPILED_MODELS", default=True
 )
+MARKOV_STATE_SIZE = 2  # What state size to use for the text models.

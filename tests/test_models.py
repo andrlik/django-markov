@@ -17,6 +17,7 @@ from django_markov.models import (
     MarkovEmptyError,
     MarkovTextModel,
     _get_corpus_char_limit,
+    _get_default_state_size,
 )
 from django_markov.text_models import POSifiedText
 
@@ -40,6 +41,26 @@ def test_get_char_limit(
 def test_get_char_limit_missing_settings(settings):
     del settings.MARKOV_CORPUS_MAX_CHAR_LIMIT
     assert _get_corpus_char_limit() == 0  # Setting was not present
+
+
+@pytest.mark.parametrize(
+    "override_value,expected_result",
+    [
+        (None, 2),
+        ("I'm a string!", 2),
+        (3, 3),
+    ],
+)
+def test_get_setting_state_size(
+    settings, override_value: int | None, expected_result
+) -> None:
+    settings.MARKOV_STATE_SIZE = override_value
+    assert _get_default_state_size() == expected_result
+
+
+def test_get_state_size_missing_settings(settings):
+    del settings.MARKOV_STATE_SIZE
+    assert _get_default_state_size() == 2  # noqa: PLR2004
 
 
 def test_text_models_return_none_on_empty_directive():
@@ -195,6 +216,27 @@ async def test_combine_invalid_parameter_combinations(
             mode=mode,
             return_type=return_type,
             weights=weights,
+        )
+
+
+@pytest.mark.asyncio
+async def test_combine_different_state_sizes(sample_corpus) -> None:
+    new_model = await MarkovTextModel.objects.acreate()
+    next_model = await MarkovTextModel.objects.acreate()
+    await new_model.aupdate_model_from_corpus(
+        corpus_entries=[
+            sample_corpus,
+            "I've got a state size of 2, which is the default.",
+        ],
+        store_compiled=False,
+        char_limit=0,
+    )
+    text_state_3 = POSifiedText(sample_corpus, state_size=3)
+    next_model.data = text_state_3.to_json()
+    await next_model.asave()
+    with pytest.raises(MarkovCombineError):
+        await MarkovTextModel.acombine_models(
+            models=[new_model, next_model], mode="strict"
         )
 
 
