@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.2.4
 
-[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.3...HEAD)
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.3...0.2.4)
 
 - Adds a new optional setting `MARKOV_STATE_SIZE` to override the default value used by `markovify`. Note that state sizes need to be consistent, so changing this setting means you should regenerate your text models with the new size.
 
