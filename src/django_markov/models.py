@@ -47,6 +47,20 @@ def _get_corpus_char_limit() -> int:
     return settings.MARKOV_CORPUS_MAX_CHAR_LIMIT
 
 
+def _get_default_state_size() -> int:
+    """Get the state size from settings or return a
+    default value. A state size of 2 is the default for markovify.
+    """
+    if not hasattr(settings, "MARKOV_STATE_SIZE") or not isinstance(
+        settings.MARKOV_STATE_SIZE, int
+    ):
+        return 2
+    return settings.MARKOV_STATE_SIZE
+
+
+STATE_SIZE = _get_default_state_size()
+
+
 class MarkovTextModel(models.Model):
     """Stores a compiled markov text model.
 
@@ -166,7 +180,7 @@ class MarkovTextModel(models.Model):
         if char_limit != 0 and char_limit < len(corpus):
             msg = f"Supplied corpus is over the maximum character limit: {char_limit}"
             raise ValueError(msg)
-        updated_model = POSifiedText(corpus)
+        updated_model = POSifiedText(corpus, state_size=STATE_SIZE)
         if store_compiled:
             updated_model.compile(inplace=True)
         self.data = updated_model.to_json()
@@ -265,6 +279,7 @@ class MarkovTextModel(models.Model):
         empty_models = []
         compiled_models = []
         workable_models = []
+        invalid_state_sizes = []
         if mode not in ["strict", "permissive"]:
             msg = f"Invalid mode: {mode}. Must be one of 'strict' or 'permissive'!"
             raise ValueError(msg)
@@ -277,18 +292,29 @@ class MarkovTextModel(models.Model):
                 "'model_instance' or 'text_model'"
             )
             raise ValueError(msg)
+        current_state_size = 0
         for model in models:
             if not model.is_ready:
                 empty_models.append(model)
             else:
                 tm = model._as_text_model()
-                if tm and tm.chain.compiled:
-                    compiled_models.append(model)
+                if tm is None:
+                    empty_models.append(
+                        model
+                    )  # no cov, catchall to make pyright happy.
                 else:
-                    workable_models.append(model)
+                    if current_state_size == 0:
+                        current_state_size = tm.state_size
+                    if tm.state_size != current_state_size:
+                        invalid_state_sizes.append(model)
+                    elif tm and tm.chain.compiled:
+                        compiled_models.append(model)
+                    else:
+                        workable_models.append(model)
         if mode == "strict":
-            if empty_models or compiled_models:
-                msg = f"There are {len(compiled_models)} compiled models "
+            if empty_models or compiled_models or invalid_state_sizes:
+                msg = f"There are {len(compiled_models)} compiled models, "
+                f"{len(invalid_state_sizes)} models with incompatible state sizes, "
                 f"and {len(empty_models)} empty models in set!"
                 raise MarkovCombineError(msg)
         if len(workable_models) <= 1:
