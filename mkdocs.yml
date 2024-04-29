@@ -12,6 +12,7 @@ nav:
   - License: license.md
 theme:
   name: material
+  custom_dir: docs/overrides
   palette:
     primary: indigo
     scheme: slate
