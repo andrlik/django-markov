@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
-[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.4...HEAD)
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.4...0.3.0)
 
 - Implements new feature: `MarkovTextModel.add_new_corpus_data_to_model` and its async counterpart. This allows you to add new corpus entries to an existing model without having to regenerate over the whole corpus. This will not work if the stored model is in a compiled state.
 
