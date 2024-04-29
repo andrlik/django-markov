@@ -283,7 +283,21 @@ class MarkovTextModel(models.Model):
         char_limit: int | None = None,
         store_compiled: bool | None = None,
     ) -> None:
-        """Sync wrapper for the async version"""
+        """Sync wrapper for the async version
+        Takes the a list of entries as the new full corpus and recreates the model,
+        saving it. The corpus must not exceed the char_limit.
+
+        Args:
+            corpus_entries (list[str]): The corpus as a list of text sentences.
+            char_limit (int | None): The maximum number of characters
+                to allow in the corpus.
+            store_compiled (bool | None): Whether to store the model in it's compiled
+                state. If None, defaults to settings.MARKOV_STORE_COMPILED_MODELS or
+                False.
+
+        Raises:
+            ValueError: If the corpus is beyond the maximum character limit.
+        """
         async_to_sync(self.aupdate_model_from_corpus)(  # no cov
             corpus_entries=corpus_entries,
             char_limit=char_limit,
@@ -443,6 +457,38 @@ class MarkovTextModel(models.Model):
     ) -> tuple["MarkovTextModel | POSifiedText", int]:
         """
         Sync wrapper of acombine_models.
+
+        Combine multiple MarkovTextModels into a single model.
+
+        Models cannot be combined if any of the following is true:
+            - They are empty of data.
+            - They are stored in compiled state.
+            - The state size between models is not the same.
+            - The underlying text models are not the same type (if you subclass).
+            - You supply weights, but not the same number as the models to combine
+                or if you use permissive mode.
+
+        Args:
+            models (list[MarkovTextModel]): A list of MarkovTextModel instances to
+                combine.
+            return_type (Literal["model_instance", "text_model"]): The desired result
+                 type.
+            mode (Literal["strict", "permissive"]): strict indicates that an exception
+                should be raised if any of the candidate models are incompatible, or
+                if those specific instances should simply be dropped from the operation.
+            weights (list[float] | None): A list of floats representing the relative
+                weights to put on each source. Optional, but can only be used with
+                mode='strict'.
+
+        Returns:
+            Either a new MarkovTextModel instance
+                persisted to the database or a POSifiedText object to manipulate at a
+                low level, and the total number of models combined.
+
+        Raises:
+            ValueError: If any of the parameter combinations is invalid
+            MarkovCombineError: If models are incompatible for combining or a markovify
+                error is raised.
         """
         return async_to_sync(cls.acombine_models)(  # no cov
             models=models, return_type=return_type, mode=mode, weights=weights
