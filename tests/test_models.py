@@ -17,6 +17,7 @@ from django_markov.models import (
     MarkovEmptyError,
     MarkovTextModel,
     _get_corpus_char_limit,
+    _get_default_compile_setting,
     _get_default_state_size,
 )
 from django_markov.text_models import POSifiedText
@@ -41,6 +42,17 @@ def test_get_char_limit(
 def test_get_char_limit_missing_settings(settings):
     del settings.MARKOV_CORPUS_MAX_CHAR_LIMIT
     assert _get_corpus_char_limit() == 0  # Setting was not present
+
+
+@pytest.mark.parametrize("override_value", [False, True])
+def test_get_compile_default_setting(settings, override_value):
+    settings.MARKOV_STORE_COMPILED_MODELS = override_value
+    assert _get_default_compile_setting() == override_value
+
+
+def test_get_compile_default_missing_settings(settings):
+    del settings.MARKOV_STORE_COMPILED_MODELS
+    assert not _get_default_compile_setting()
 
 
 @pytest.mark.parametrize(
@@ -284,3 +296,82 @@ async def test_acombine_successful(
     )
     assert isinstance(result, expected_result_type)
     assert total_combined == num_clean
+
+
+def test_add_data_to_compiled_model_raises_exception(
+    compiled_model, sample_corpus
+) -> None:
+    old_modify = compiled_model.modified
+    old_data = compiled_model.data
+    with pytest.raises(MarkovCombineError):
+        compiled_model.add_new_corpus_data_to_model(
+            [sample_corpus, "This is not going to work."]
+        )
+    compiled_model.refresh_from_db()
+    assert compiled_model.modified == old_modify
+    assert compiled_model.data == old_data
+
+
+@pytest.mark.parametrize(
+    "corpus_entries,char_limit,weights,expected_exception",
+    [
+        ([], None, None, MarkovEmptyError),
+        ([], None, [1.0, 1.0], MarkovEmptyError),
+        (["I like springtime.", "Does this bring joy?"], None, [1.0], ValueError),
+        (["I like springtime.", "Does this bring joy?"], 0, [], ValueError),
+        (
+            ["I like springtime.", "Does this bring joy?"],
+            None,
+            [1.0, 1.3, 1.0],
+            ValueError,
+        ),
+    ],
+)
+def test_add_data_to_model_invocation_failures(
+    text_model, sample_corpus, corpus_entries, char_limit, weights, expected_exception
+):
+    text_model.update_model_from_corpus([sample_corpus], store_compiled=False)
+    text_model.refresh_from_db()
+    old_data = text_model.data
+    old_modify = text_model.modified
+    with pytest.raises(expected_exception):
+        text_model.add_new_corpus_data_to_model(
+            corpus_entries=corpus_entries, weights=weights
+        )
+    text_model.refresh_from_db()
+    assert text_model.modified == old_modify
+    assert text_model.data == old_data
+
+
+@pytest.mark.parametrize(
+    "corpus_entries,char_limit,weights",
+    [
+        (["I like springtime.", "Does this bring joy?"], None, None),
+        (["I like springtime.", "Does this bring joy?"], 0, None),
+        (["I like springtime.", "Does this bring joy?"], None, [1.0, 1.0]),
+    ],
+)
+def test_add_data_to_model_success(
+    text_model, sample_corpus, corpus_entries, char_limit, weights
+):
+    text_model.update_model_from_corpus([sample_corpus], store_compiled=False)
+    text_model.refresh_from_db()
+    old_data = text_model.data
+    old_modify = text_model.modified
+    text_model.add_new_corpus_data_to_model(
+        corpus_entries=corpus_entries, char_limit=char_limit, weights=weights
+    )
+    text_model.refresh_from_db()
+    assert text_model.data != old_data
+    assert text_model.modified > old_modify
+
+
+def test_add_data_to_empty_model_falls_back_to_update(text_model):
+    assert not text_model.data
+    old_modify = text_model.modified
+    text_model.add_new_corpus_data_to_model(
+        corpus_entries=["I like springtime.", "Does this bring joy?"]
+    )
+    text_model.refresh_from_db()
+    assert text_model.data is not None
+    assert text_model.modified > old_modify

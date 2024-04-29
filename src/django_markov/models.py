@@ -61,6 +61,15 @@ def _get_default_state_size() -> int:
 STATE_SIZE = _get_default_state_size()
 
 
+def _get_default_compile_setting() -> bool:
+    """Get the default value from settings."""
+    if not hasattr(settings, "MARKOV_STORE_COMPILED_MODELS") or not isinstance(
+        settings.MARKOV_STORE_COMPILED_MODELS, bool
+    ):
+        return False
+    return settings.MARKOV_STORE_COMPILED_MODELS
+
+
 class MarkovTextModel(models.Model):
     """Stores a compiled markov text model.
 
@@ -148,6 +157,90 @@ class MarkovTextModel(models.Model):
             return text_model
         return text_model.compile(inplace=True)  # type: ignore
 
+    async def aadd_new_corpus_data_to_model(
+        self,
+        corpus_entries: list[str],
+        *,
+        char_limit: int | None = None,
+        weights: list[float] | None = None,
+    ) -> None:
+        """Takes a list of new corpus entries and incorporates them into the model.
+        Unlike `aupdate_model_from_corpus`, this method is additive. This works by
+        first creating a text model based on the new entries, and then uses
+        `markovify.combine` to add them to the existing text model. Note that
+        this will fail if the stored model is compiled.
+
+        Args:
+            corpus_entries (list[str]): A list of text sentences to add.
+            char_limit (int | None): The character limit to use for the new corpus.
+                Use `0` for no limit.
+            weights (list[float] | None): The weighting to use for combine
+                operation, the first value representing the saved model, and the second
+                representing the new entries.
+
+        Raises:
+            MarkovCombineError: If the stored model is already compiled.
+            MarkovEmptyError: If the new models are empty.
+        """
+        saved_model = self._as_text_model()
+        if self.data is None or self.data == "" or saved_model is None:
+            # There's no existing model, use update instead.
+            return await self.aupdate_model_from_corpus(
+                corpus_entries=corpus_entries, char_limit=char_limit
+            )
+        if char_limit is None:
+            char_limit = _get_corpus_char_limit()
+        if weights is not None and len(weights) != 2:  # noqa: PLR2004
+            msg = "If provided, weights must have exactly two entries!"
+            raise ValueError(msg)
+        corpus = " ".join(corpus_entries)
+        if len(corpus_entries) == 0 or corpus.replace(" ", "") == "":
+            msg = "There are no corpus entries to add!"
+            raise MarkovEmptyError(msg)
+        if saved_model.chain.compiled:
+            msg = "Saved model is compiled, cannot combine!"
+            raise MarkovCombineError(msg)
+        new_model = POSifiedText(corpus, state_size=saved_model.state_size)
+        try:
+            combined_model = markovify.combine(
+                [saved_model, new_model], weights=weights
+            )
+        except ValueError as ve:  # no cov
+            # If markovify raises any other unexpected error.
+            msg = f"The following error occurred while combining: {ve}"
+            raise MarkovCombineError(msg) from ve
+        if (
+            combined_model is not None and type(combined_model) is POSifiedText
+        ):  # no cov
+            self.data = combined_model.to_json()
+            await self.asave()
+
+    def add_new_corpus_data_to_model(
+        self,
+        corpus_entries: list[str],
+        *,
+        char_limit: int | None = None,
+        weights: list[float] | None = None,
+    ) -> None:
+        """Sync wrapper for `aadd_new_corpus_data_to_model`.
+
+        Args:
+            corpus_entries (list[str]): A list of text sentences to add.
+            char_limit (int | None): The character limit to use for the new corpus.
+                Use `0` for no limit.
+            weights (list[float] | None): The weighting to use for combine
+                operation, the first value representing the saved model, and the second
+                representing the new entries.
+
+        Raises:
+            MarkovCombineError: If the stored model is already compiled.
+            MarkovEmptyError: If the new models are empty.
+            ValueError: If weights are supplied, and they do not have a length of two.
+        """
+        return async_to_sync(self.aadd_new_corpus_data_to_model)(
+            corpus_entries=corpus_entries, char_limit=char_limit, weights=weights
+        )
+
     async def aupdate_model_from_corpus(
         self,
         corpus_entries: list[str],
@@ -155,8 +248,8 @@ class MarkovTextModel(models.Model):
         char_limit: int | None = None,
         store_compiled: bool | None = None,
     ) -> None:
-        """Takes the corpus and updates the model, saving it.
-        The corpus must not exceed the char_limit.
+        """Takes the a list of entries as the new full corpus and recreates the model,
+        saving it. The corpus must not exceed the char_limit.
 
         Args:
             corpus_entries (list[str]): The corpus as a list of text sentences.
@@ -165,17 +258,14 @@ class MarkovTextModel(models.Model):
             store_compiled (bool | None): Whether to store the model in it's compiled
                 state. If None, defaults to settings.MARKOV_STORE_COMPILED_MODELS or
                 False.
+
+        Raises:
+            ValueError: If the corpus is beyond the maximum character limit.
         """
         if not char_limit:
             char_limit = _get_corpus_char_limit()
-        if (
-            store_compiled is None
-            and hasattr(settings, "MARKOV_STORE_COMPILED_MODELS")
-            and isinstance(settings.MARKOV_STORE_COMPILED_MODELS, bool)
-        ):
-            store_compiled = settings.MARKOV_STORE_COMPILED_MODELS
-        else:
-            store_compiled = False
+        if store_compiled is None:
+            store_compiled = _get_default_compile_setting()
         corpus = " ".join(corpus_entries)
         if char_limit != 0 and char_limit < len(corpus):
             msg = f"Supplied corpus is over the maximum character limit: {char_limit}"
@@ -193,7 +283,21 @@ class MarkovTextModel(models.Model):
         char_limit: int | None = None,
         store_compiled: bool | None = None,
     ) -> None:
-        """Sync wrapper for the async version"""
+        """Sync wrapper for the async version
+        Takes the a list of entries as the new full corpus and recreates the model,
+        saving it. The corpus must not exceed the char_limit.
+
+        Args:
+            corpus_entries (list[str]): The corpus as a list of text sentences.
+            char_limit (int | None): The maximum number of characters
+                to allow in the corpus.
+            store_compiled (bool | None): Whether to store the model in it's compiled
+                state. If None, defaults to settings.MARKOV_STORE_COMPILED_MODELS or
+                False.
+
+        Raises:
+            ValueError: If the corpus is beyond the maximum character limit.
+        """
         async_to_sync(self.aupdate_model_from_corpus)(  # no cov
             corpus_entries=corpus_entries,
             char_limit=char_limit,
@@ -274,6 +378,11 @@ class MarkovTextModel(models.Model):
             Either a new MarkovTextModel instance
                 persisted to the database or a POSifiedText object to manipulate at a
                 low level, and the total number of models combined.
+
+        Raises:
+            ValueError: If any of the parameter combinations is invalid
+            MarkovCombineError: If models are incompatible for combining or a markovify
+                error is raised.
         """
         # First we check to ensure that the models are combinable.
         empty_models = []
@@ -348,6 +457,38 @@ class MarkovTextModel(models.Model):
     ) -> tuple["MarkovTextModel | POSifiedText", int]:
         """
         Sync wrapper of acombine_models.
+
+        Combine multiple MarkovTextModels into a single model.
+
+        Models cannot be combined if any of the following is true:
+            - They are empty of data.
+            - They are stored in compiled state.
+            - The state size between models is not the same.
+            - The underlying text models are not the same type (if you subclass).
+            - You supply weights, but not the same number as the models to combine
+                or if you use permissive mode.
+
+        Args:
+            models (list[MarkovTextModel]): A list of MarkovTextModel instances to
+                combine.
+            return_type (Literal["model_instance", "text_model"]): The desired result
+                 type.
+            mode (Literal["strict", "permissive"]): strict indicates that an exception
+                should be raised if any of the candidate models are incompatible, or
+                if those specific instances should simply be dropped from the operation.
+            weights (list[float] | None): A list of floats representing the relative
+                weights to put on each source. Optional, but can only be used with
+                mode='strict'.
+
+        Returns:
+            Either a new MarkovTextModel instance
+                persisted to the database or a POSifiedText object to manipulate at a
+                low level, and the total number of models combined.
+
+        Raises:
+            ValueError: If any of the parameter combinations is invalid
+            MarkovCombineError: If models are incompatible for combining or a markovify
+                error is raised.
         """
         return async_to_sync(cls.acombine_models)(  # no cov
             models=models, return_type=return_type, mode=mode, weights=weights
