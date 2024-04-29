@@ -74,6 +74,7 @@ dev-dependencies = [
     "pytest-mock>=3.14.0",
     "faker>=24.4.0",
     "bandit[toml]>=1.7.8",
+    "mike>=2.0.0",
 ]
 
 [tool.hatch.metadata]

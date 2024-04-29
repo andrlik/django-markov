@@ -16,6 +16,9 @@ theme:
     primary: indigo
     scheme: slate
     accent: deep-purple
+extra:
+  version:
+    provider: mike
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -29,6 +32,8 @@ plugins:
   - search
   - autorefs
   - include-markdown
+  - mike:
+      canonical_version: latest
   - gen-files:
       scripts:
         - docs/scripts/gen_ref_files.py
