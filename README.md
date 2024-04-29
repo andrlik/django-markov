@@ -112,6 +112,20 @@ async def create_my_text_model() -> MarkovTextModel:
     return text_model
 ```
 
+You can also later add to that model with new entries, as long as you haven't stored it in a compiled state.
+
+```python
+from django_markov.models import MarkovTextModel
+
+my_markov_model_instance = MarkovTextModel.objects.first()
+my_markov_model_instance.add_new_corpus_data_to_model(
+    corpus_entries=[
+        "I like burgers and fries.",
+        "I once ate a pickle larger than my hand.",
+    ]
+)
+```
+
 Once you have a model initialized, you can have it generate a sentence. For example,
 say that you have a text model in your database already, and you want a sentence generated.
 
