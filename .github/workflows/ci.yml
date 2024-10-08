@@ -44,7 +44,7 @@ jobs:
         run: |
           uv sync --inexact
           uv pip install pip
-          uv run -m spacy info en_core_web_trf && echo "Lang model installed already." || uv run -m spacy download en_core_web_trf
+          uv run --no-sync -m spacy info en_core_web_trf && echo "Lang model installed already." || uv run -m spacy download en_core_web_trf
           source .venv/bin/activate
           echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
           echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
@@ -52,8 +52,8 @@ jobs:
 
       - name: Run tests
         run: |
-          uv run --with Django~="${{ matrix.django-version }}.0" -m pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/django_markov
-          uv run -m coverage lcov
+          uv run --no-sync --with Django~="${{ matrix.django-version }}.0" -m pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/django_markov
+          uv run --no-sync --with Django~="${{ matrix.django-version }}.0" -m coverage lcov
 
       - name: Submit coverage data to coveralls.io
         uses: coverallsapp/github-action@master
