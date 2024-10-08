@@ -44,8 +44,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ matrix.python-version}}-Django-${{ matrix.django_version }}-${{ hashFiles('uv.lock') }}
-          restore-keys: venv-${{ runner.os }}-${{ matrix.python-version}}-Django-${{ matrix.django_version }}-
+          key: venv-${{ runner.os }}-${{ matrix.python-version}}-${{ hashFiles('uv.lock') }}
+          restore-keys: venv-${{ runner.os }}-${{ matrix.python-version}}-
 
       - name: Create venv, install dependencies
         run: |
