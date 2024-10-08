@@ -1,12 +1,12 @@
 exclude: "^docs/|/migrations/|malformed_podcast_rss_feed.xml"
-default_stages: [commit]
+default_stages: [pre-commit]
 
 default_language_version:
   python: python3.11
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: check-ast
@@ -27,30 +27,30 @@ repos:
       - id: requirements-txt-fixer
 
   - repo: https://github.com/emzeat/mz-lictools
-    rev: v2.4.4
+    rev: v2.7.0
     hooks:
       - id: license-tools
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.8.0.3
+    rev: v0.10.0.1
     hooks:
       - id: shellcheck
 
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.16.0
+    rev: 1.21.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "5.0"]
 
   - repo: https://github.com/rtts/djhtml
-    rev: v1.4.11
+    rev: 3.0.6
     hooks:
       - id: djhtml
         args:
           - --tabwidth=2
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.5.1
+    rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         types_or:
@@ -61,7 +61,7 @@ repos:
         - '@prettier/plugin-xml@1.2.0'
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.6.0
+    rev: v9.12.0
     hooks:
       - id: eslint
         args:
@@ -72,7 +72,7 @@ repos:
         - eslint-config-prettier@8.3.0
 
   - repo: https://github.com/thibaudcolas/curlylint
-    rev: v0.13.0
+    rev: v0.13.1
     hooks:
       - id: curlylint
         additional_dependencies:
@@ -93,14 +93,12 @@ repos:
         files: \.py$
 
   - repo: https://github.com/asottile/blacken-docs
-    rev: v1.12.0
+    rev: 1.19.0
     hooks:
       -  id: blacken-docs
-         additional_dependencies:
-         - black==21.12b0
 
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.8
+    rev: 1.7.10
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml"]
