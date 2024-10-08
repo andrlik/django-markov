@@ -9,7 +9,7 @@ and [spacy](https://spacy.io).
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-markov)
 ![PyPI - Versions from Framework Classifiers](https://img.shields.io/pypi/frameworkversions/django/django-markov)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![Rye](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/rye/main/artwork/badge.json)](https://rye-up.com)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![security: bandit](https://img.shields.io/badge/security-bandit-brightgreen.svg)](https://github.com/PyCQA/bandit)
@@ -39,7 +39,7 @@ This will install the app and all its dependencies but you will still need to do
 trained language model.
 
 ```bash
-python -m spacy download en-core-web-trf
+python -m spacy download en_core_web_trf
 ```
 
 Then add the application and its dependency to your Django settings file, and optionally configure the corpus
