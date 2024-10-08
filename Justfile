@@ -10,7 +10,12 @@ help:
 
 # Install pre-commit hooks
 _install-pre-commit: _check-pre-commit
-    pre-commit install
+    #!/usr/bin/env bash
+    if [[ ! -f .git/hooks/pre-commit ]]; then
+      echo "Pre-commit hooks are not installed yet! Doing so now."
+      pre-commit install
+    fi
+    exit 0
 
 # Downloads and installs uv on your system. If on Windows, follow the directions at https://docs.astral.sh/uv/getting-started/installation/ instead.
 uv-install:
@@ -48,10 +53,10 @@ _check-env:
 # Setup the project and update dependencies.
 bootstrap: uv-install _install-pre-commit _check-env
     #!/usr/bin/env bash
-    uv sync
-    DJANGO_SETTINGS_MODULE="tests.settings" PYTHONPATH="$PYTHONPATH:$(pwd)" uv run django-admin migrate
+    uv sync --inexact
     uv pip install pip
-    uv run -m spacy download en-core-web-trf
+    uv run -m spacy info en_core_web_trf && echo "Lang model is already installed" || uv run -m spacy download en_core_web_trf
+    DJANGO_SETTINGS_MODULE="tests.settings" PYTHONPATH="$PYTHONPATH:$(pwd)" uv run django-admin migrate
 
 # Checks that project is ready for development.
 check: _check-pre-commit
