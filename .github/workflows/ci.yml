@@ -39,9 +39,6 @@ jobs:
 
       - name: Set up Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
-        with:
-          python-version: ${{ matrix.python-version }}
-          django-version: ${{ matrix.django-version }}
 
       - name: Create venv, install dependencies
         run: |
