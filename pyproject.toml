@@ -8,7 +8,7 @@ authors = [
 dependencies = [
     "django>=4.2",
     "markovify>=0.9.4",
-    "spacy>=3.7.4",
+    "spacy>3.8.1",
 ]
 readme = "README.md"
 license = "BSD-3-Clause"
@@ -46,7 +46,7 @@ test = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.rye]
+[tool.uv]
 managed = true
 dev-dependencies = [
     "pytest-django>=4.8.0",
@@ -63,8 +63,6 @@ dev-dependencies = [
     "mkdocs-include-markdown-plugin>=6.0.4",
     "mkdocs-material>=9.5.14",
     "django-types>=0.19.1",
-    # This is so you can develop without relying on pip.
-    "en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.7.3/en_core_web_trf-3.7.3-py3-none-any.whl",
     "black>=24.3.0",
     "django-coverage>=1.2.4",
     "django-coverage-plugin>=3.1.0",
