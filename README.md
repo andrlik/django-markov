@@ -168,7 +168,7 @@ using `.envrc` for direnv, a `.env` file or similar.
 export DJANGO_DEBUG="True"
 ```
 
-We use [just](https://github.com/casey/just) and [Rye](https://rye-up) to manage our project.
+We use [just](https://github.com/casey/just) and [uv](https://github.com/astral-sh/uv) to manage our project.
 If you don't already have `just` installed, follow the directions on their project page.
 
 Then run our setup command.
@@ -181,7 +181,7 @@ It will do the following for you:
 
 - Check if you've set the above environment variable.
 - Check if pre-commit is on your path.
-- Check if Rye is installed, and install it if it is not.
+- Check if uv is installed, and install it if it is not.
 - Install the pre-commit hooks into your repo.
 - Create your virtualenv with all requirements.
 - Run migrations
