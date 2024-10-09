@@ -81,6 +81,10 @@ lint: check
 test *ARGS: check
     uv run -m pytest {{ ARGS }}
 
+# Run tox for code style, type checking, and multi-python tests. Uses run-parallel.
+tox *ARGS: check
+    uvx --python 3.12 --with tox-uv tox run-parallel {{ ARGS }}
+
 # Runs bandit safety checks.
 safety: check
     uv run -m bandit -c pyproject.toml -r src
