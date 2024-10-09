@@ -206,6 +206,7 @@ reportIncompatibleVariableOverride = false
 # Directories that are not visited by pytest collector:
 testpaths = ["src/django_markov", "tests"]
 DJANGO_SETTINGS_MODULE = "tests.settings"
+asyncio_default_fixture_loop_scope = "function"
 pythonpath = [".", "src"]
 django_find_project = false
 norecursedirs = ["hooks", "*.egg", ".eggs", "dist", "build", "docs", ".tox", ".git", "__pycache__", ".venv"]
