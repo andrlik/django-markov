@@ -53,9 +53,7 @@ _check-env:
 # Setup the project and update dependencies.
 bootstrap: uv-install _install-pre-commit _check-env
     #!/usr/bin/env bash
-    uv sync --inexact
-    uv pip install pip
-    uv run -m spacy info en_core_web_trf && echo "Lang model is already installed" || uv run -m spacy download en_core_web_trf
+    uv sync
     DJANGO_SETTINGS_MODULE="tests.settings" PYTHONPATH="$PYTHONPATH:$(pwd)" uv run django-admin migrate
 
 # Checks that project is ready for development.
