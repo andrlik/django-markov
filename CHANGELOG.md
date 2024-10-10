@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.3.0...0.3.1)
+
+- Officially support Django 5.1.
+
 ## 0.3.0
 
 [Compare the full difference](https://github.com/andrlik/django-markov/compare/0.2.4...0.3.0)

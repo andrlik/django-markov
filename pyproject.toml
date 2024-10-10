@@ -15,6 +15,7 @@ license = "BSD-3-Clause"
 requires-python = ">= 3.11"
 classifiers = [
     "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
     "License :: OSI Approved :: BSD License",
     "Framework :: Django",
     "Programming Language :: Python :: 3.11",
