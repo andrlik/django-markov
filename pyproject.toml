@@ -1,6 +1,6 @@
 [project]
 name = "django-markov"
-version = "0.3.0"
+version = "0.3.1"
 description = "django-markov is a reusable Django app that enables you to create Markov text models, and store them in the database. Those models can then be used to generate Markov chain sentences."
 authors = [
     { name = "Daniel Andrlik", email = "daniel@andrlik.org" }
@@ -256,7 +256,7 @@ with_dev = true
 commands = [["pyright"]]
 
 [tool.bumpversion]
-current_version = "0.3.0"
+current_version = "0.3.1"
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
