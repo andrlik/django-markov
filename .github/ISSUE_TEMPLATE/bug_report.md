@@ -28,6 +28,7 @@ Please provide the following information
 
 - Version
 - Django version
+- Spacy and model version
 - Python version
 - Web server (e.g. gunicorn/uvicorn, Daphne, Waitress, etc)
 
