@@ -3,10 +3,10 @@ name: test
 on:
   push:
     branches: [main]
-    paths-ignore: [ "docs/**", "README.md", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "Justfile"]
+    paths-ignore: [ "docs/**", "README.md", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "Justfile", ".github/workflows/publish.yml", ".github/dependabot.yml", ".github/*_TEMPLATE/*.md"]
   pull_request:
     branches: [main]
-    paths-ignore: [ "docs/**", "README.md", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "Justfile"]
+    paths-ignore: [ "docs/**", "README.md", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "Justfile", ".github/workflows/publish.yml", ".github/dependabot.yml", ".github/*_TEMPLATE/*.md"]
 
 concurrency:
     group: test-${{ github.head_ref }}
