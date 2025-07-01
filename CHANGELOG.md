@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.4.0...HEAD)
+
+- Bump spacy version
+
 ## 0.4.0
 
 [Compare the full difference](https://github.com/andrlik/django-markov/compare/0.3.1...0.4.0)

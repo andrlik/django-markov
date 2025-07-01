@@ -568,7 +568,7 @@ requires-dist = [
     { name = "pytest-django", marker = "extra == 'test'" },
     { name = "pytest-mock", marker = "extra == 'test'" },
     { name = "pytest-sugar", marker = "extra == 'test'" },
-    { name = "spacy", specifier = ">3.8.1" },
+    { name = "spacy", specifier = ">=3.8.7" },
 ]
 provides-extras = ["test"]
 

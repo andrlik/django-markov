@@ -8,7 +8,7 @@ authors = [
 dependencies = [
     "django>=4.2",
     "markovify>=0.9.4",
-    "spacy>3.8.1",
+    "spacy>=3.8.7",
 ]
 readme = "README.md"
 license = "BSD-3-Clause"
