@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+[Compare the full difference](https://github.com/andrlik/django-markov/compare/0.3.0...HEAD)
+
+- Adds support for Python 3.13 and Django 5.2.
+- Updates spacy trained model to en_core_web_sm for performance. **Regenerate your models after upgrading.**
+
 ## 0.3.1
 
 [Compare the full difference](https://github.com/andrlik/django-markov/compare/0.3.0...0.3.1)
