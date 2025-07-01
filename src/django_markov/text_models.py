@@ -1,16 +1,14 @@
-#
 # text_models.py
 #
-# Copyright (c) 2024 Daniel Andrlik
+# Copyright (c) 2024 - 2025 Daniel Andrlik
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
-#
 
-import markovify
-import spacy
+import markovify  # type: ignore
+import spacy  # type: ignore
 
-nlp = spacy.load("en_core_web_trf")
+nlp = spacy.load("en_core_web_sm")
 
 
 class POSifiedText(markovify.Text):

@@ -32,14 +32,14 @@ python -m pip install django-markov
 Using uv:
 
 ```bash
-python -m uv pip install django-markov
+uv pip install django-markov
 ```
 
 This will install the app and all its dependencies but you will still need to download a
-trained language model.
+trained language model. You should use `en_core_web_sm`.
 
 ```bash
-python -m spacy download en_core_web_trf
+python -m spacy download en_core_web_sm
 ```
 
 Then add the application and its dependency to your Django settings file, and optionally configure the corpus

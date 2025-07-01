@@ -16,10 +16,12 @@ requires-python = ">= 3.11"
 classifiers = [
     "Framework :: Django :: 5.0",
     "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
     "License :: OSI Approved :: BSD License",
     "Framework :: Django",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Development Status :: 4 - Beta",
 ]
 
@@ -68,7 +70,7 @@ dev-dependencies = [
     "black>=24.3.0",
     "django-coverage>=1.2.4",
     "django-coverage-plugin>=3.1.0",
-    "en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl",
+    "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
     "argon2-cffi>=23.1.0",
     "django-environ>=0.11.2",
     "django-extensions>=3.2.3",
@@ -232,7 +234,7 @@ addopts = [
 ignore = ["W004"]
 
 [tool.tox]
-env_list = ["3.12", "3.11", "lint", "types"]
+env_list = ["3.13", "3.12", "3.11", "lint", "types"]
 
 [tool.tox.env_run_base]
 description = "Run tests under {base_python}"
