@@ -1,26 +1,38 @@
 set dotenv-load := true
+set unstable := true
+
+PORT := env("PORT", "8000")
+ARGS_TEST := env("_UV_RUN_ARGS_TEST", "")
+ARGS_SERVE := env("_UV_RUN_ARGS_SERVE", "")
 
 # Lists all available commands
-help:
+@_:
     just --list
+
+# Execute cog against supplied arguments for all our files.
+_cog:
+    uvx --from cogapp cog -r README.md
 
 # ---------------------------------------------- #
 # Script to rule them all recipes.               #
 # ---------------------------------------------- #
 
 # Install pre-commit hooks
+[script]
 _install-pre-commit: _check-pre-commit
-    #!/usr/bin/env bash
     if [[ ! -f .git/hooks/pre-commit ]]; then
       echo "Pre-commit hooks are not installed yet! Doing so now."
       pre-commit install
     fi
     exit 0
 
-# Downloads and installs uv on your system. If on Windows, follow the directions at https://docs.astral.sh/uv/getting-started/installation/ instead.
+# Downloads and installs uv on your system.
+[group('uv')]
+[linux]
+[macos]
+[script]
+[unix]
 uv-install:
-    #!/usr/bin/env bash
-    set -euo pipefail
     if ! command -v uv &> /dev/null;
     then
       echo "uv is not found on path! Starting install..."
@@ -29,36 +41,52 @@ uv-install:
       uv self update
     fi
 
+# Downloads and installs uv on your system.
+[group('uv')]
+[script]
+[windows]
+uv-install:
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
 # Update uv
+[group('uv')]
 uv-update:
     uv self update
 
 # Uninstall uv
+[group('uv')]
 uv-uninstall:
     uv self uninstall
 
+[script]
 _check-pre-commit:
-    #!/usr/bin/env bash
     if ! command -v pre-commit &> /dev/null; then
       echo "Pre-commit is not installed!"
       exit 1
     fi
 
+[script]
 _check-env:
-    #!/usr/bin/env bash
     if [[ -z "$DJANGO_DEBUG" ]]; then
       echo "DJANGO_DEBUG is not set and application will run in production mode." >&2
     fi
 
-# Setup the project and update dependencies.
-bootstrap: uv-install _install-pre-commit _check-env
-    #!/usr/bin/env bash
+# Setup the venv and install all dependencies.
+[group('lifecycle')]
+[script('bash')]
+install: uv-install _install-pre-commit _check-env
     uv sync
     DJANGO_SETTINGS_MODULE="tests.settings" PYTHONPATH="$PYTHONPATH:$(pwd)" uv run django-admin migrate
 
+# Update project dependencies.
+[group('lifecycle')]
+upgrade: _check-env
+    uv sync --upgrade
+
 # Checks that project is ready for development.
-check: _check-pre-commit
-    #!/usr/bin/env bash
+[group('lifecycle')]
+[script]
+_check: _check-pre-commit
     if ! command -v uv &> /dev/null; then
       echo "uv is not installed!"
       exit 1
@@ -69,45 +97,75 @@ check: _check-pre-commit
     fi
 
 # Run just formatter and rye formatter.
-fmt: check
+[group('qa')]
+fmt: _check
     just --fmt --unstable
     uv run -m ruff format
 
 # Run ruff linting
-lint: check
+[group('qa')]
+lint: _check
     uv run -m ruff check
 
 # Run the test suite
-test *ARGS: check
-    uv run -m pytest {{ ARGS }}
+[group('qa')]
+test *ARGS: _check
+    uv run {{ ARGS_TEST }} -m pytest {{ ARGS }}
 
 # Run tox for code style, type checking, and multi-python tests. Uses run-parallel.
-tox *ARGS: check
+[group('qa')]
+tox *ARGS: _check
     uvx --python 3.12 --with tox-uv tox run-parallel {{ ARGS }}
 
 # Runs bandit safety checks.
-safety: check
+[group('qa')]
+safety: _check
     uv run -m bandit -c pyproject.toml -r src
 
 # Access Django management commands.
-manage *ARGS: check
-    #!/usr/bin/env bash
+[group('run')]
+[script('bash')]
+manage *ARGS: _check
     DJANGO_SETTINGS_MODULE="tests.settings" PYTHONPATH="$PYTHONPATH:$(pwd)" uv run django-admin {{ ARGS }}
 
-# Run tests in CI.
-citest:
-    # TODO
+# Run the development server
+[group('run')]
+[script('bash')]
+serve *ARGS: _check
+    DJANGO_SETTINGS_MODULE="tests.settings" PYTHONPATH="$PYTHONPATH:$(pwd)" uv run {{ ARGS_SERVE }} django-admin runserver 127.0.0.1:{{ PORT }} {{ ARGS }}
+
+# Send a request to the development server to print to stdout. Uses curl if present, else httpie.
+[group('run')]
+[script]
+req path="admin/" *ARGS:
+    if ! [ -x "$(command -v curl)" ]; then
+        @just _http {{ ARGS }} http://127.0.0.1:{{ PORT }}/{{ path }}
+    else
+        curl {{ ARGS }} -L http://127.0.0.1:{{ PORT }}/{{ path }}
+    fi
+
+# Invoke http from httpie
+_http *ARGS:
+    uvx --from httpie http {{ ARGS }}
+
+# Open development server in a web browser
+[group('run')]
+browser:
+    uv run -m webbrowser -t http://127.0.0.1:{{ PORT }}
 
 # Check types
-check-types: check
+[group('qa')]
+check-types: _check
     uv run -m pyright
 
 # Access mike commands
-docs *ARGS: check
+[group('lifecycle')]
+docs *ARGS: _check
     uv run mike {{ ARGS }}
 
 # Build Python package
-build *ARGS: check
+[group('lifecycle')]
+build *ARGS: _check
     uv build {{ ARGS }}
 
 # Deletes pycache directories and files
@@ -122,5 +180,18 @@ _build-remove:
 _docs-clean:
     rm -rf site/*
 
-# Removes build artifacts
-clean: _pycache-remove _build-remove _docs-clean
+# Remove various test and lint caches.
+_qa-cache-clean:
+    rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage* htmlcov
+
+# Remove any created virtualenvs
+_env-clean:
+    rm -rf .tox .venv
+
+# Removes build and testing artifacts
+[group('lifecycle')]
+clean: _pycache-remove _build-remove _docs-clean _qa-cache-clean
+
+# Recreate environment from scratch
+[group('lifecycle')]
+fresh: clean _env-clean install

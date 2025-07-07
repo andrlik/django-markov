@@ -174,7 +174,7 @@ If you don't already have `just` installed, follow the directions on their proje
 Then run our setup command.
 
 ```bash
-just bootstrap
+just install
 ```
 
 It will do the following for you:
@@ -187,7 +187,47 @@ It will do the following for you:
 - Run migrations
 
 Our Justfile can handle a lot of the admin tasks for you without having to worry about
-whether you've activated your venv. To see all the commands you can run `just help`.
+whether you've activated your venv. To see all the commands you can run `just` on its own.
+
+<!-- [[[cog
+import subprocess
+import cog
+
+list = subprocess.run(["just"], stdout=subprocess.PIPE)
+cog.out(
+    f"```\n{list.stdout.decode('utf-8')}```"
+)
+]]] -->
+```
+Available recipes:
+    [lifecycle]
+    build *ARGS             # Build Python package
+    clean                   # Removes build and testing artifacts
+    docs *ARGS              # Access mike commands
+    fresh                   # Recreate environment from scratch
+    install                 # Setup the venv and install all dependencies.
+    upgrade                 # Update project dependencies.
+
+    [qa]
+    check-types             # Check types
+    fmt                     # Run just formatter and rye formatter.
+    lint                    # Run ruff linting
+    safety                  # Runs bandit safety checks.
+    test *ARGS              # Run the test suite
+    tox *ARGS               # Run tox for code style, type checking, and multi-python tests. Uses run-parallel.
+
+    [run]
+    browser                 # Open development server in a web browser
+    manage *ARGS            # Access Django management commands.
+    req path="admin/" *ARGS # Send a request to the development server to print to stdout. Uses curl if present, else httpie.
+    serve *ARGS             # Run the development server
+
+    [uv]
+    uv-install              # Downloads and installs uv on your system.
+    uv-uninstall            # Uninstall uv
+    uv-update               # Update uv
+```
+<!-- [[[end]]] -->
 
 For example, to access Django functions such as `makemigrations`, run:
 
