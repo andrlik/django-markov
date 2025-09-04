@@ -5,6 +5,9 @@ them in the database. Those models can then be used to generate Markov chain sen
 It relies on the excellent [markovify](https://github.com/jsvine/markovify) by [Jeremy Singer-Vine](https://github.com/jsvine)
 and [spacy](https://spacy.io).
 
+> [!IMPORTANT]
+> This project has [migrated to Codeberg](https://codeberg.org/andrlik/django-markov) as of release 0.5.0. All updates, issues, and pull requests will occur there.
+
 [![PyPI - Version](https://img.shields.io/pypi/v/django-markov)](https://pypi.org/project/django-markov/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-markov)
 ![PyPI - Versions from Framework Classifiers](https://img.shields.io/pypi/frameworkversions/django/django-markov)
